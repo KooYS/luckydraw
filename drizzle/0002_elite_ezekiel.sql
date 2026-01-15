@@ -1,0 +1,2 @@
+ALTER TABLE `payment_accounts` ADD `event_id` int NOT NULL;--> statement-breakpoint
+ALTER TABLE `payment_accounts` ADD CONSTRAINT `payment_accounts_event_id_events_id_fk` FOREIGN KEY (`event_id`) REFERENCES `events`(`id`) ON DELETE cascade ON UPDATE no action;

@@ -1,0 +1,1 @@
+ALTER TABLE `payment_accounts` ADD `default_amount` int;
