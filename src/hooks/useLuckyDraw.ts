@@ -175,7 +175,7 @@ export function useLuckyDraw({
     try {
       const progressInterval = setInterval(() => {
         setDrawProgress((prev) => Math.min(prev + 2, 95));
-      }, 70);
+      }, 50);
 
       const response = await fetch("/api/draw", {
         method: "POST",
@@ -185,7 +185,7 @@ export function useLuckyDraw({
 
       const data = await response.json();
 
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      await new Promise((resolve) => setTimeout(resolve, 300));
 
       clearInterval(progressInterval);
       setDrawProgress(100);
