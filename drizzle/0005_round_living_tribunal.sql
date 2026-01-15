@@ -1,0 +1,1 @@
+ALTER TABLE `events` ADD `sub_text_color` varchar(7) DEFAULT '#6b7280' NOT NULL;

@@ -53,6 +53,7 @@ export const events = mysqlTable('events', {
   secondaryColor: varchar('secondary_color', { length: 7 }).default('#701a75').notNull(),
   backgroundColor: varchar('background_color', { length: 7 }).default('#fdf4ff').notNull(),
   textColor: varchar('text_color', { length: 7 }).default('#1f2937').notNull(),
+  subTextColor: varchar('sub_text_color', { length: 7 }).default('#6b7280').notNull(),
   accentColor: varchar('accent_color', { length: 7 }).default('#e879f9').notNull(),
 
   // 이미지
@@ -157,7 +158,7 @@ export type NewPaymentAccount = typeof paymentAccounts.$inferInsert
 // 테마 타입
 export type EventTheme = Pick<
   Event,
-  'primaryColor' | 'secondaryColor' | 'backgroundColor' | 'textColor' | 'accentColor' | 'posterUrl' | 'logoUrl'
+  'primaryColor' | 'secondaryColor' | 'backgroundColor' | 'textColor' | 'subTextColor' | 'accentColor' | 'posterUrl' | 'logoUrl'
 >
 
 // Soft Delete 가능한 테이블 타입

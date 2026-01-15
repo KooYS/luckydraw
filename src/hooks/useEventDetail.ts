@@ -20,6 +20,7 @@ export interface EventFormState {
   secondaryColor: string;
   backgroundColor: string;
   textColor: string;
+  subTextColor: string;
   accentColor: string;
   posterUrl: string;
 }
@@ -44,6 +45,7 @@ const INITIAL_EVENT_FORM: EventFormState = {
   secondaryColor: "#701a75",
   backgroundColor: "#fdf4ff",
   textColor: "#1f2937",
+  subTextColor: "#6b7280",
   accentColor: "#e879f9",
   posterUrl: "",
 };
@@ -144,6 +146,7 @@ export function useEventDetail(eventId: string): UseEventDetailReturn {
         secondaryColor: event.secondaryColor || "#701a75",
         backgroundColor: event.backgroundColor || "#fdf4ff",
         textColor: event.textColor || "#1f2937",
+        subTextColor: event.subTextColor || "#6b7280",
         accentColor: event.accentColor || "#e879f9",
         posterUrl: event.posterUrl || "",
       });

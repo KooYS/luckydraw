@@ -66,7 +66,10 @@ interface DrawPageColors {
 }
 
 /** 럭키드로우 비즈니스 로직 훅 */
-export function useLuckyDraw({ eventId, onThemeChange }: UseLuckyDrawOptions): UseLuckyDrawReturn {
+export function useLuckyDraw({
+  eventId,
+  onThemeChange,
+}: UseLuckyDrawOptions): UseLuckyDrawReturn {
   const [event, setEvent] = useState<Event | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -76,21 +79,22 @@ export function useLuckyDraw({ eventId, onThemeChange }: UseLuckyDrawOptions): U
   const [drawProgress, setDrawProgress] = useState(0);
 
   /** 실시간 확률 계산 */
-  const calculateRealTimeProbabilities = useCallback((): ProductWithProbability[] => {
-    const availableProducts = products.filter((p) => p.remainingQuantity > 0);
-    const totalRemainingQuantity = availableProducts.reduce(
-      (sum, p) => sum + p.remainingQuantity,
-      0
-    );
+  const calculateRealTimeProbabilities =
+    useCallback((): ProductWithProbability[] => {
+      const availableProducts = products.filter((p) => p.remainingQuantity > 0);
+      const totalRemainingQuantity = availableProducts.reduce(
+        (sum, p) => sum + p.remainingQuantity,
+        0
+      );
 
-    return products.map((p) => ({
-      ...p,
-      realTimeProbability:
-        p.remainingQuantity > 0 && totalRemainingQuantity > 0
-          ? ((p.remainingQuantity / totalRemainingQuantity) * 100).toFixed(1)
-          : "0.0",
-    }));
-  }, [products]);
+      return products.map((p) => ({
+        ...p,
+        realTimeProbability:
+          p.remainingQuantity > 0 && totalRemainingQuantity > 0
+            ? ((p.remainingQuantity / totalRemainingQuantity) * 100).toFixed(1)
+            : "0.0",
+      }));
+    }, [products]);
 
   /** 이벤트 및 상품 데이터 로드 */
   useEffect(() => {
@@ -108,6 +112,7 @@ export function useLuckyDraw({ eventId, onThemeChange }: UseLuckyDrawOptions): U
             secondaryColor: eventData.secondaryColor,
             backgroundColor: eventData.backgroundColor,
             textColor: eventData.textColor,
+            subTextColor: eventData.subTextColor,
             accentColor: eventData.accentColor,
             posterUrl: eventData.posterUrl,
             logoUrl: eventData.logoUrl,
@@ -128,12 +133,22 @@ export function useLuckyDraw({ eventId, onThemeChange }: UseLuckyDrawOptions): U
   const colors: DrawPageColors = event
     ? {
         textColor: hasPoster ? "#ffffff" : event.textColor,
-        textColorMuted: hasPoster ? "rgba(255,255,255,0.7)" : event.secondaryColor,
-        textColorFaint: hasPoster ? "rgba(255,255,255,0.5)" : event.secondaryColor,
+        textColorMuted: hasPoster
+          ? "rgba(255,255,255,0.7)"
+          : event.subTextColor,
+        textColorFaint: hasPoster
+          ? "rgba(255,255,255,0.5)"
+          : event.subTextColor,
         cardBg: hasPoster ? "rgba(255,255,255,0.1)" : `${event.accentColor}20`,
-        cardBgHover: hasPoster ? "rgba(255,255,255,0.2)" : `${event.accentColor}30`,
-        buttonBg: hasPoster ? "rgba(255,255,255,0.2)" : `${event.secondaryColor}20`,
-        buttonBgHover: hasPoster ? "rgba(255,255,255,0.3)" : `${event.secondaryColor}30`,
+        cardBgHover: hasPoster
+          ? "rgba(255,255,255,0.2)"
+          : `${event.accentColor}30`,
+        buttonBg: hasPoster
+          ? "rgba(255,255,255,0.2)"
+          : `${event.secondaryColor}20`,
+        buttonBgHover: hasPoster
+          ? "rgba(255,255,255,0.3)"
+          : `${event.secondaryColor}30`,
         inputBg: hasPoster ? "#ffffff" : event.backgroundColor,
         inputText: hasPoster ? event.primaryColor : event.textColor,
         infoBg: hasPoster ? "rgba(0,0,0,0.3)" : `${event.secondaryColor}15`,
@@ -160,7 +175,7 @@ export function useLuckyDraw({ eventId, onThemeChange }: UseLuckyDrawOptions): U
     try {
       const progressInterval = setInterval(() => {
         setDrawProgress((prev) => Math.min(prev + 2, 95));
-      }, 200);
+      }, 70);
 
       const response = await fetch("/api/draw", {
         method: "POST",

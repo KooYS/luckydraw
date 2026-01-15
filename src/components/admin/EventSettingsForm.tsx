@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import ImageUpload from "@/components/common/ImageUpload";
+import { ColorPicker, ColorSwatchGroup, ThemePreview } from "@/components/admin/theme";
 import type { EventFormState } from "@/hooks/useEventDetail";
 
 interface EventSettingsFormProps {
@@ -22,6 +23,15 @@ export default function EventSettingsForm({
   updateField,
   isPending,
 }: EventSettingsFormProps) {
+  const swatches = [
+    { label: "메인", color: form.primaryColor },
+    { label: "보조", color: form.secondaryColor },
+    { label: "배경", color: form.backgroundColor, border: true },
+    { label: "강조", color: form.accentColor },
+    { label: "제목", color: form.textColor },
+    { label: "본문", color: form.subTextColor },
+  ];
+
   return (
     <form onSubmit={onSubmit} className="space-y-6">
       <Card>
@@ -77,14 +87,19 @@ export default function EventSettingsForm({
               value={form.accentColor}
               onChange={(value) => updateField("accentColor", value)}
             />
+            <ColorPicker
+              label="제목 텍스트"
+              value={form.textColor}
+              onChange={(value) => updateField("textColor", value)}
+            />
+            <ColorPicker
+              label="본문 텍스트"
+              value={form.subTextColor}
+              onChange={(value) => updateField("subTextColor", value)}
+            />
           </div>
 
-          <div className="mt-6 flex gap-3">
-            <ColorSwatch label="메인" color={form.primaryColor} />
-            <ColorSwatch label="보조" color={form.secondaryColor} />
-            <ColorSwatch label="배경" color={form.backgroundColor} border />
-            <ColorSwatch label="강조" color={form.accentColor} />
-          </div>
+          <ColorSwatchGroup swatches={swatches} />
 
           <ThemePreview form={form} />
         </CardContent>
@@ -112,96 +127,5 @@ export default function EventSettingsForm({
         {isPending ? "저장 중..." : "설정 저장"}
       </Button>
     </form>
-  );
-}
-
-/** 색상 선택 컴포넌트 */
-function ColorPicker({
-  label,
-  value,
-  onChange,
-}: {
-  label: string;
-  value: string;
-  onChange: (value: string) => void;
-}) {
-  return (
-    <div className="space-y-2">
-      <Label>{label}</Label>
-      <div className="flex gap-2">
-        <input
-          type="color"
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          className="w-12 h-10 rounded cursor-pointer border"
-        />
-        <Input value={value} onChange={(e) => onChange(e.target.value)} className="flex-1" />
-      </div>
-    </div>
-  );
-}
-
-/** 색상 스와치 컴포넌트 */
-function ColorSwatch({
-  label,
-  color,
-  border,
-}: {
-  label: string;
-  color: string;
-  border?: boolean;
-}) {
-  return (
-    <div className="flex-1 text-center">
-      <div
-        className={`h-12 rounded-lg mb-1 ${border ? "border" : ""}`}
-        style={{ backgroundColor: color }}
-      />
-      <span className="text-xs text-muted-foreground">{label}</span>
-    </div>
-  );
-}
-
-/** 테마 미리보기 컴포넌트 */
-function ThemePreview({ form }: { form: EventFormState }) {
-  return (
-    <div className="mt-6">
-      <p className="text-sm text-muted-foreground mb-2">화면 미리보기</p>
-      <div
-        className="p-8 rounded-xl text-center relative overflow-hidden"
-        style={{ backgroundColor: form.backgroundColor }}
-      >
-        <div
-          className="absolute top-0 left-0 w-24 h-24 rounded-full opacity-20 -translate-x-1/2 -translate-y-1/2"
-          style={{ backgroundColor: form.secondaryColor }}
-        />
-        <div
-          className="absolute bottom-0 right-0 w-32 h-32 rounded-full opacity-20 translate-x-1/2 translate-y-1/2"
-          style={{ backgroundColor: form.accentColor }}
-        />
-
-        <div className="relative z-10">
-          <h3
-            className="text-2xl font-bold mb-4"
-            style={{ color: form.primaryColor }}
-          >
-            {form.name || "이벤트 이름"}
-          </h3>
-          <button
-            type="button"
-            className="px-8 py-3 rounded-full text-white font-bold shadow-lg"
-            style={{
-              backgroundColor: form.primaryColor,
-              boxShadow: `0 4px 20px ${form.primaryColor}50`,
-            }}
-          >
-            럭키드로우
-          </button>
-          <p className="mt-4 text-sm" style={{ color: form.secondaryColor }}>
-            행운을 시험해보세요!
-          </p>
-        </div>
-      </div>
-    </div>
   );
 }
