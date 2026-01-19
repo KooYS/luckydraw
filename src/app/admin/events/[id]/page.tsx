@@ -134,6 +134,7 @@ export default function EventDetailPage() {
           onOpenChange={(open) => !open && actions.closeProductForm()}
           editingProduct={state.editingProduct}
           form={state.productForm}
+          products={state.products}
           onSubmit={actions.submitProduct}
           onCancel={actions.closeProductForm}
           updateField={actions.updateProductForm}

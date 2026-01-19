@@ -40,11 +40,15 @@ export default function StockOverview({
         <div className="grid grid-cols-3 gap-4 mb-6">
           <div className="p-4 bg-blue-50 rounded-lg text-center">
             <p className="text-sm text-blue-600 mb-1">총 수량</p>
-            <p className="text-2xl font-bold text-blue-700">{totalQuantity}개</p>
+            <p className="text-2xl font-bold text-blue-700">
+              {totalQuantity}개
+            </p>
           </div>
           <div className="p-4 bg-green-50 rounded-lg text-center">
             <p className="text-sm text-green-600 mb-1">남은 재고</p>
-            <p className="text-2xl font-bold text-green-700">{totalRemaining}개</p>
+            <p className="text-2xl font-bold text-green-700">
+              {totalRemaining}개
+            </p>
           </div>
           <div className="p-4 bg-purple-50 rounded-lg text-center">
             <p className="text-sm text-purple-600 mb-1">소진률</p>
@@ -66,7 +70,9 @@ export default function StockOverview({
               <div
                 key={product.id}
                 className={`flex items-center gap-4 p-3 rounded-lg ${
-                  product.remainingQuantity > 0 ? "bg-muted/50" : "bg-muted opacity-60"
+                  product.remainingQuantity > 0
+                    ? "bg-muted/50"
+                    : "bg-muted opacity-60"
                 }`}
               >
                 <span
@@ -86,7 +92,7 @@ export default function StockOverview({
                     variant="outline"
                     className="bg-blue-100 text-blue-700 border-blue-200"
                   >
-                    {product.initialProbability.toFixed(1)}%
+                    {product.baseProbability.toFixed(1)}%
                   </Badge>
                 </span>
                 <span className="w-24 text-center">
@@ -107,7 +113,8 @@ export default function StockOverview({
         )}
 
         <p className="text-xs text-muted-foreground mt-4">
-          * 확률은 수량에 비례하여 자동 계산됩니다. 재고가 소진되면 해당 상품은 제외됩니다.
+          * 확률은 수량에 비례하여 자동 계산됩니다. 재고가 소진되면 해당 상품은
+          제외됩니다.
         </p>
       </CardContent>
     </Card>

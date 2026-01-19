@@ -10,6 +10,7 @@ export interface ProductFormState {
   description: string;
   imageUrl: string;
   totalQuantity: string;
+  weight: string;
 }
 
 /** 이벤트 설정 폼 상태 타입 */
@@ -27,7 +28,11 @@ export interface EventFormState {
 
 /** 확률이 포함된 상품 타입 */
 export interface ProductWithProbability extends Product {
-  initialProbability: number;
+  /** 기본 확률 (가중치 미적용, 수량만 기반) */
+  baseProbability: number;
+  /** 실제 확률 (가중치 적용) */
+  weightedProbability: number;
+  /** 현재 재고 기준 확률 */
   currentProbability: number;
 }
 
@@ -36,6 +41,7 @@ const INITIAL_PRODUCT_FORM: ProductFormState = {
   description: "",
   imageUrl: "",
   totalQuantity: "",
+  weight: "1.00",
 };
 
 const INITIAL_EVENT_FORM: EventFormState = {
@@ -177,6 +183,7 @@ export function useEventDetail(eventId: string): UseEventDetailReturn {
       description: string;
       imageUrl: string;
       totalQuantity: number;
+      weight: number;
     }) => {
       const res = await fetch(`/api/events/${eventId}/products`, {
         method: "POST",
@@ -259,17 +266,42 @@ export function useEventDetail(eventId: string): UseEventDetailReturn {
   const totalRemaining = products.reduce((sum, p) => sum + p.remainingQuantity, 0);
   const consumptionRate = totalQuantity > 0 ? (1 - totalRemaining / totalQuantity) * 100 : 0;
 
-  const calculateProbability = (quantity: number, useRemaining = false) => {
-    const total = useRemaining ? totalRemaining : totalQuantity;
-    if (total === 0) return 0;
-    return (quantity / total) * 100;
-  };
+  // 가중치 적용 총합 계산
+  const totalWeightedQuantity = products.reduce((sum, p) => {
+    const weight = typeof p.weight === "string" ? parseFloat(p.weight) : (p.weight ?? 1);
+    return sum + p.totalQuantity * weight;
+  }, 0);
 
-  const productsWithProbability: ProductWithProbability[] = products.map((p) => ({
-    ...p,
-    initialProbability: calculateProbability(p.totalQuantity, false),
-    currentProbability: calculateProbability(p.remainingQuantity, true),
-  }));
+  const totalWeightedRemaining = products.reduce((sum, p) => {
+    const weight = typeof p.weight === "string" ? parseFloat(p.weight) : (p.weight ?? 1);
+    return sum + p.remainingQuantity * weight;
+  }, 0);
+
+  const productsWithProbability: ProductWithProbability[] = products.map((p) => {
+    const weight = typeof p.weight === "string" ? parseFloat(p.weight) : (p.weight ?? 1);
+
+    // 기본 확률 (가중치 미적용)
+    const baseProbability = totalQuantity > 0
+      ? (p.totalQuantity / totalQuantity) * 100
+      : 0;
+
+    // 가중치 적용 확률
+    const weightedProbability = totalWeightedQuantity > 0
+      ? ((p.totalQuantity * weight) / totalWeightedQuantity) * 100
+      : 0;
+
+    // 현재 재고 기준 확률 (가중치 적용)
+    const currentProbability = totalWeightedRemaining > 0
+      ? ((p.remainingQuantity * weight) / totalWeightedRemaining) * 100
+      : 0;
+
+    return {
+      ...p,
+      baseProbability,
+      weightedProbability,
+      currentProbability,
+    };
+  });
 
   const canRunDraw = !!event?.isActive && products.length > 0 && totalRemaining > 0;
 
@@ -294,6 +326,7 @@ export function useEventDetail(eventId: string): UseEventDetailReturn {
       description: product.description || "",
       imageUrl: product.imageUrl || "",
       totalQuantity: String(product.totalQuantity),
+      weight: String(product.weight ?? "1.00"),
     });
     setEditingProduct(product);
     setShowProductForm(true);
@@ -304,6 +337,7 @@ export function useEventDetail(eventId: string): UseEventDetailReturn {
     (e: React.FormEvent) => {
       e.preventDefault();
       const newTotal = parseInt(productForm.totalQuantity);
+      const weight = parseFloat(productForm.weight) || 1.0;
 
       if (editingProduct) {
         const oldTotal = editingProduct.totalQuantity;
@@ -319,6 +353,7 @@ export function useEventDetail(eventId: string): UseEventDetailReturn {
             imageUrl: productForm.imageUrl,
             totalQuantity: newTotal,
             remainingQuantity: newRemaining,
+            weight: String(weight),
           },
         });
       } else {
@@ -327,6 +362,7 @@ export function useEventDetail(eventId: string): UseEventDetailReturn {
           description: productForm.description,
           imageUrl: productForm.imageUrl,
           totalQuantity: newTotal,
+          weight,
         });
       }
     },

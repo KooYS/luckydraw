@@ -81,6 +81,9 @@ export const products = mysqlTable('products', {
   // 당첨 확률 (0.00 ~ 100.00) - 레거시, 수량 기반으로 대체됨
   probability: decimal('probability', { precision: 5, scale: 2 }).notNull(),
 
+  // 가중치 (기본값 1.0, 높을수록 당첨 확률 증가)
+  weight: decimal('weight', { precision: 5, scale: 2 }).default('1.00').notNull(),
+
   // 재고 관리
   totalQuantity: int('total_quantity').notNull(),
   remainingQuantity: int('remaining_quantity').notNull(),

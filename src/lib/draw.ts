@@ -11,12 +11,14 @@ export interface DrawResult {
 
 export interface ProductWithProbability extends Product {
   calculatedProbability: number;
+  weightedValue: number; // remainingQuantity * weight
   rangeStart: number;
   rangeEnd: number;
 }
 
 export interface DrawStatistics {
   totalRemainingQuantity: number;
+  totalWeightedValue: number;
   canDraw: boolean;
   products: ProductWithProbability[];
 }
@@ -38,7 +40,7 @@ function secureRandomInt(min: number, max: number): number {
   return randomInt(min, max + 1);
 }
 
-/** 상품 목록의 추첨 통계 계산 */
+/** 상품 목록의 추첨 통계 계산 (가중치 기반) */
 export function calculateDrawStatistics(products: Product[]): DrawStatistics {
   const availableProducts = products.filter((p) => p.remainingQuantity > 0);
 
@@ -47,21 +49,31 @@ export function calculateDrawStatistics(products: Product[]): DrawStatistics {
     0
   );
 
+  // 가중치를 적용한 총 값 계산
+  const totalWeightedValue = availableProducts.reduce((sum, p) => {
+    const weight = typeof p.weight === "string" ? parseFloat(p.weight) : (p.weight ?? 1);
+    return sum + p.remainingQuantity * weight;
+  }, 0);
+
   let cumulative = 0;
   const productsWithProbability: ProductWithProbability[] =
     availableProducts.map((product) => {
+      const weight = typeof product.weight === "string" ? parseFloat(product.weight) : (product.weight ?? 1);
+      const weightedValue = product.remainingQuantity * weight;
+
       const probability =
-        totalRemainingQuantity > 0
-          ? (product.remainingQuantity / totalRemainingQuantity) * 100
+        totalWeightedValue > 0
+          ? (weightedValue / totalWeightedValue) * 100
           : 0;
 
       const rangeStart = cumulative;
-      cumulative += product.remainingQuantity;
+      cumulative += weightedValue;
       const rangeEnd = cumulative;
 
       return {
         ...product,
         calculatedProbability: Math.round(probability * 10000) / 10000,
+        weightedValue,
         rangeStart,
         rangeEnd,
       };
@@ -69,6 +81,7 @@ export function calculateDrawStatistics(products: Product[]): DrawStatistics {
 
   return {
     totalRemainingQuantity,
+    totalWeightedValue,
     canDraw: totalRemainingQuantity > 0,
     products: productsWithProbability.sort(
       (a, b) => b.calculatedProbability - a.calculatedProbability
@@ -110,15 +123,15 @@ export function executeDraw(products: Product[]): DrawResult {
     return { isWin: false, product: null };
   }
 
-  const { totalRemainingQuantity, products: weightedProducts } = stats;
+  const { totalWeightedValue, products: weightedProducts } = stats;
 
   const sortedByRange = [...weightedProducts].sort(
     (a, b) => a.rangeStart - b.rangeStart
   );
 
   const { value: normalizedRandom, seed } = secureRandom();
-  const randomInteger = Math.floor(normalizedRandom * totalRemainingQuantity);
-  const selectedProduct = binarySearchProduct(sortedByRange, randomInteger);
+  const randomValue = normalizedRandom * totalWeightedValue;
+  const selectedProduct = binarySearchProduct(sortedByRange, randomValue);
 
   if (!selectedProduct) {
     const lastProduct = sortedByRange[sortedByRange.length - 1];

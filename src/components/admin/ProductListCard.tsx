@@ -4,6 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import type { ProductWithProbability } from "@/hooks/useEventDetail";
 
 interface ProductListCardProps {
@@ -63,12 +69,21 @@ export default function ProductListCard({
                   <div>
                     <h3 className="font-bold">{product.name}</h3>
                     <div className="flex items-center gap-2 mt-1">
-                      <Badge
-                        variant="outline"
-                        className="bg-blue-100 text-blue-700 border-blue-200"
-                      >
-                        {product.initialProbability.toFixed(1)}%
-                      </Badge>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Badge
+                              variant="outline"
+                              className="bg-blue-100 text-blue-700 border-blue-200 cursor-help"
+                            >
+                              {product.baseProbability.toFixed(1)}%
+                            </Badge>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>가중치 적용 확률: {product.weightedProbability.toFixed(2)}%</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
                       <span className="text-sm text-muted-foreground">
                         (수량: {product.totalQuantity}개)
                       </span>
