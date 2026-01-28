@@ -66,6 +66,23 @@ class ProductRepository extends BaseRepository<typeof products> {
       .where(eq(products.id, id));
   }
 
+  /** 재고 일괄 감소 (상품ID별 감소량) */
+  async batchDecrementStock(decrements: Record<number, number>) {
+    const entries = Object.entries(decrements);
+    if (entries.length === 0) return;
+
+    await Promise.all(
+      entries.map(([id, count]) =>
+        db
+          .update(this.table)
+          .set({
+            remainingQuantity: sql`GREATEST(${products.remainingQuantity} - ${count}, 0)`,
+          })
+          .where(eq(products.id, Number(id)))
+      )
+    );
+  }
+
   /** 재고 조정 */
   async adjustStock(id: number, adjustment: number) {
     const product = await this.findById(id);

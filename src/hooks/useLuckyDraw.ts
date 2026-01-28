@@ -46,7 +46,7 @@ interface UseLuckyDrawReturn {
     setQuantity: (qty: number) => void;
     incrementQuantity: () => void;
     decrementQuantity: () => void;
-    setQuickQuantity: (qty: number) => void;
+    quickIncrement: (qty: number) => void;
     executeDraw: () => Promise<void>;
     reset: () => void;
   };
@@ -74,7 +74,7 @@ export function useLuckyDraw({
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [drawState, setDrawState] = useState<DrawState>("select");
-  const [quantity, setQuantity] = useState(1);
+  const [quantity, setQuantity] = useState(0);
   const [summary, setSummary] = useState<DrawSummary[]>([]);
   const [drawProgress, setDrawProgress] = useState(0);
 
@@ -168,6 +168,9 @@ export function useLuckyDraw({
 
   /** 럭키드로우 실행 */
   const executeDraw = useCallback(async () => {
+    if (quantity === 0) return;
+
+    console.log("quantity", quantity);
     setDrawState("drawing");
     setSummary([]);
     setDrawProgress(0);
@@ -216,9 +219,9 @@ export function useLuckyDraw({
   }, []);
 
   /** 빠른 수량 선택 */
-  const setQuickQuantity = useCallback(
+  const quickIncrement = useCallback(
     (qty: number) => {
-      setQuantity(Math.min(qty, totalStock));
+      setQuantity((prev) => Math.min(prev + qty, totalStock));
     },
     [totalStock],
   );
@@ -252,7 +255,7 @@ export function useLuckyDraw({
       setQuantity: handleSetQuantity,
       incrementQuantity,
       decrementQuantity,
-      setQuickQuantity,
+      quickIncrement,
       executeDraw,
       reset,
     },

@@ -36,8 +36,11 @@ export default function StockDisplay({
       style={{ backgroundColor: colors.infoBg }}
     >
       <div className="flex justify-between items-center mb-3">
-        <h3 className="text-sm font-medium" style={{ color: colors.textColorMuted }}>
-          실시간 재고 & 확률
+        <h3
+          className="text-sm font-medium"
+          style={{ color: colors.textColorMuted }}
+        >
+          실시간 재고
         </h3>
         <span className="text-xs" style={{ color: colors.textColorFaint }}>
           총 재고: {totalStock}개
@@ -65,7 +68,7 @@ export default function StockDisplay({
                   {product.name}
                 </span>
                 <div className="flex items-center gap-3">
-                  <span
+                  {/* <span
                     className="text-xs font-bold"
                     style={{
                       color:
@@ -75,7 +78,7 @@ export default function StockDisplay({
                     }}
                   >
                     {product.realTimeProbability}%
-                  </span>
+                  </span> */}
                   <span
                     className="text-xs font-mono"
                     style={{

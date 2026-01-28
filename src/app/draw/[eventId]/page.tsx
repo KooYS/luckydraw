@@ -37,14 +37,17 @@ export default function DrawPage() {
   }
 
   const { event } = state;
-  const { colors, hasPoster, hasStock, totalStock, productsWithProbability } = computed;
+  const { colors, hasPoster, hasStock, totalStock, productsWithProbability } =
+    computed;
 
   return (
     <main
       className="min-h-screen flex flex-col items-center justify-center p-8 relative overflow-hidden"
       style={{
         backgroundColor: event.backgroundColor,
-        backgroundImage: event.posterUrl ? `url(${event.posterUrl})` : undefined,
+        backgroundImage: event.posterUrl
+          ? `url(${event.posterUrl})`
+          : undefined,
         backgroundSize: "cover",
         backgroundPosition: "center",
       }}
@@ -53,7 +56,11 @@ export default function DrawPage() {
 
       <div className="relative z-10 text-center w-full max-w-lg">
         {event.logoUrl ? (
-          <img src={event.logoUrl} alt={event.name} className="h-16 mx-auto mb-6" />
+          <img
+            src={event.logoUrl}
+            alt={event.name}
+            className="h-16 mx-auto mb-6"
+          />
         ) : (
           <h1
             className="text-3xl font-bold mb-6"
@@ -71,7 +78,7 @@ export default function DrawPage() {
               onIncrement={actions.incrementQuantity}
               onDecrement={actions.decrementQuantity}
               onChange={actions.setQuantity}
-              onQuickSelect={actions.setQuickQuantity}
+              onQuickIncrement={actions.quickIncrement}
               colors={colors}
               primaryColor={event.primaryColor}
             />
@@ -84,7 +91,9 @@ export default function DrawPage() {
             />
 
             {!hasStock && (
-              <p style={{ color: "#ef4444" }}>모든 상품의 재고가 소진되었습니다.</p>
+              <p style={{ color: "#ef4444" }}>
+                모든 상품의 재고가 소진되었습니다.
+              </p>
             )}
           </div>
         )}

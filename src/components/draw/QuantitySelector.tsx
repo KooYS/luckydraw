@@ -6,7 +6,7 @@ interface QuantitySelectorProps {
   onIncrement: () => void;
   onDecrement: () => void;
   onChange: (qty: number) => void;
-  onQuickSelect: (qty: number) => void;
+  onQuickIncrement: (qty: number) => void;
   colors: {
     textColor: string;
     buttonBg: string;
@@ -24,7 +24,7 @@ export default function QuantitySelector({
   onIncrement,
   onDecrement,
   onChange,
-  onQuickSelect,
+  onQuickIncrement,
   colors,
   primaryColor,
 }: QuantitySelectorProps) {
@@ -72,12 +72,12 @@ export default function QuantitySelector({
         {quickOptions.map((n) => (
           <button
             key={n}
-            onClick={() => onQuickSelect(n)}
+            onClick={() => onQuickIncrement(n)}
             disabled={n > maxQuantity}
             className="px-4 py-2 rounded-lg text-sm font-medium transition"
             style={{
-              backgroundColor: quantity === n ? primaryColor : colors.buttonBg,
-              color: quantity === n ? "#fff" : colors.textColor,
+              backgroundColor: primaryColor,
+              color: colors.textColor,
               opacity: n > maxQuantity ? 0.5 : 1,
               cursor: n > maxQuantity ? "not-allowed" : "pointer",
             }}

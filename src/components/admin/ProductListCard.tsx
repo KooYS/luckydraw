@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -11,6 +12,63 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import type { ProductWithProbability } from "@/hooks/useEventDetail";
+
+/** 재고 입력 컴포넌트 (로컬 상태 관리) */
+function StockInput({
+  productId,
+  remainingQuantity,
+  totalQuantity,
+  onSetStock,
+  disabled,
+}: {
+  productId: number;
+  remainingQuantity: number;
+  totalQuantity: number;
+  onSetStock: (productId: number, newValue: number) => void;
+  disabled: boolean;
+}) {
+  const [localValue, setLocalValue] = useState(String(remainingQuantity));
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // 서버 값이 변경되면 로컬 값도 업데이트 (단, 포커스 중이 아닐 때만)
+  useEffect(() => {
+    if (document.activeElement !== inputRef.current) {
+      setLocalValue(String(remainingQuantity));
+    }
+  }, [remainingQuantity]);
+
+  const handleBlur = () => {
+    const newValue = parseInt(localValue) || 0;
+    const clampedValue = Math.max(0, Math.min(totalQuantity, newValue));
+    setLocalValue(String(clampedValue));
+    if (clampedValue !== remainingQuantity) {
+      onSetStock(productId, clampedValue);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      inputRef.current?.blur();
+    }
+  };
+
+  return (
+    <Input
+      ref={inputRef}
+      type="number"
+      min={0}
+      max={totalQuantity}
+      value={localValue}
+      onChange={(e) => setLocalValue(e.target.value)}
+      onBlur={handleBlur}
+      onKeyDown={handleKeyDown}
+      disabled={disabled}
+      className={`w-16 h-8 text-center font-mono text-sm px-1 ${
+        remainingQuantity === 0 ? "text-destructive" : ""
+      }`}
+    />
+  );
+}
 
 interface ProductListCardProps {
   products: ProductWithProbability[];
@@ -68,7 +126,7 @@ export default function ProductListCard({
                   )}
                   <div>
                     <h3 className="font-bold">{product.name}</h3>
-                    <div className="flex items-center gap-2 mt-1">
+                    <div className="flex flex-col items-start gap-2 mt-1">
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger asChild>
@@ -80,18 +138,23 @@ export default function ProductListCard({
                             </Badge>
                           </TooltipTrigger>
                           <TooltipContent>
-                            <p>가중치 적용 확률: {product.weightedProbability.toFixed(2)}%</p>
+                            <p>
+                              가중치 적용 확률:{" "}
+                              {product.weightedProbability.toFixed(2)}%
+                            </p>
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
-                      <span className="text-sm text-muted-foreground">
-                        (수량: {product.totalQuantity}개)
-                      </span>
-                      {product.description && (
+                      <div className="flex items-center gap-2 ">
                         <span className="text-sm text-muted-foreground">
-                          · {product.description}
+                          (수량: {product.totalQuantity}개)
                         </span>
-                      )}
+                        {product.description && (
+                          <span className="text-sm text-muted-foreground truncate overflow-hidden w-[200px]">
+                            · {product.description}
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -102,22 +165,19 @@ export default function ProductListCard({
                       variant="outline"
                       size="sm"
                       onClick={() => onAdjustStock(product.id, -1)}
-                      disabled={product.remainingQuantity === 0 || adjustPending}
+                      disabled={
+                        product.remainingQuantity === 0 || adjustPending
+                      }
                     >
                       -
                     </Button>
                     <div className="flex items-center gap-1">
-                      <Input
-                        type="number"
-                        min={0}
-                        max={product.totalQuantity}
-                        value={product.remainingQuantity}
-                        onChange={(e) =>
-                          onSetStock(product.id, parseInt(e.target.value) || 0)
-                        }
-                        className={`w-16 h-8 text-center font-mono text-sm px-1 ${
-                          product.remainingQuantity === 0 ? "text-destructive" : ""
-                        }`}
+                      <StockInput
+                        productId={product.id}
+                        remainingQuantity={product.remainingQuantity}
+                        totalQuantity={product.totalQuantity}
+                        onSetStock={onSetStock}
+                        disabled={adjustPending}
                       />
                       <span className="text-muted-foreground text-sm">
                         / {product.totalQuantity}
@@ -136,7 +196,11 @@ export default function ProductListCard({
                     </Button>
                   </div>
 
-                  <Button variant="outline" size="sm" onClick={() => onEdit(product)}>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => onEdit(product)}
+                  >
                     수정
                   </Button>
                   <Button
