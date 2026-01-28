@@ -33,7 +33,6 @@ interface UseLuckyDrawReturn {
     drawState: DrawState;
     quantity: number;
     summary: DrawSummary[];
-    drawProgress: number;
   };
   computed: {
     totalStock: number;
@@ -76,7 +75,6 @@ export function useLuckyDraw({
   const [drawState, setDrawState] = useState<DrawState>("select");
   const [quantity, setQuantity] = useState(0);
   const [summary, setSummary] = useState<DrawSummary[]>([]);
-  const [drawProgress, setDrawProgress] = useState(0);
 
   /** 실시간 확률 계산 */
   const calculateRealTimeProbabilities =
@@ -170,16 +168,10 @@ export function useLuckyDraw({
   const executeDraw = useCallback(async () => {
     if (quantity === 0) return;
 
-    console.log("quantity", quantity);
     setDrawState("drawing");
     setSummary([]);
-    setDrawProgress(0);
 
     try {
-      const progressInterval = setInterval(() => {
-        setDrawProgress((prev) => Math.min(prev + 2, 95));
-      }, 1);
-
       const response = await fetch("/api/draw", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -187,9 +179,6 @@ export function useLuckyDraw({
       });
 
       const data = await response.json();
-
-      clearInterval(progressInterval);
-      setDrawProgress(100);
 
       setSummary(data.summary || []);
       setProducts(data.updatedProducts || []);
@@ -205,7 +194,6 @@ export function useLuckyDraw({
     setDrawState("select");
     setSummary([]);
     setQuantity(1);
-    setDrawProgress(0);
   }, []);
 
   /** 수량 증가 */
@@ -242,7 +230,6 @@ export function useLuckyDraw({
       drawState,
       quantity,
       summary,
-      drawProgress,
     },
     computed: {
       totalStock,

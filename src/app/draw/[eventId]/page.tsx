@@ -101,7 +101,6 @@ export default function DrawPage() {
         {state.drawState === "drawing" && (
           <DrawProgress
             quantity={state.quantity}
-            progress={state.drawProgress}
             hasPoster={hasPoster}
             primaryColor={event.primaryColor}
             colors={colors}

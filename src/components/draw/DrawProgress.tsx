@@ -2,7 +2,6 @@
 
 interface DrawProgressProps {
   quantity: number;
-  progress: number;
   hasPoster: boolean;
   primaryColor: string;
   colors: {
@@ -14,7 +13,6 @@ interface DrawProgressProps {
 /** 추첨 진행 상태 컴포넌트 */
 export default function DrawProgress({
   quantity,
-  progress,
   hasPoster,
   primaryColor,
   colors,
@@ -34,16 +32,16 @@ export default function DrawProgress({
 
       <div className="w-full max-w-xs mt-4">
         <div
-          className="h-2 rounded-full overflow-hidden"
+          className="h-2 rounded-full overflow-hidden relative"
           style={{ backgroundColor: colors.buttonBg }}
         >
           <div
-            className="h-full transition-all duration-100"
-            style={{ width: `${progress}%`, backgroundColor: primaryColor }}
+            className="absolute h-full w-1/3 rounded-full animate-indeterminate"
+            style={{ backgroundColor: primaryColor }}
           />
         </div>
         <p className="text-sm mt-2" style={{ color: colors.textColorMuted }}>
-          {progress}%
+          추첨 진행 중...
         </p>
       </div>
     </div>

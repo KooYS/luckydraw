@@ -166,6 +166,19 @@ a,
   animation: spin-slow 1s linear infinite;
 }
 
+@keyframes indeterminate {
+  0% {
+    left: -33%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+.animate-indeterminate {
+  animation: indeterminate 1.2s ease-in-out infinite;
+}
+
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
