@@ -84,7 +84,7 @@ export function useLuckyDraw({
       const availableProducts = products.filter((p) => p.remainingQuantity > 0);
       const totalRemainingQuantity = availableProducts.reduce(
         (sum, p) => sum + p.remainingQuantity,
-        0
+        0,
       );
 
       return products.map((p) => ({
@@ -175,7 +175,7 @@ export function useLuckyDraw({
     try {
       const progressInterval = setInterval(() => {
         setDrawProgress((prev) => Math.min(prev + 2, 95));
-      }, 50);
+      }, 1);
 
       const response = await fetch("/api/draw", {
         method: "POST",
@@ -185,12 +185,8 @@ export function useLuckyDraw({
 
       const data = await response.json();
 
-      await new Promise((resolve) => setTimeout(resolve, 300));
-
       clearInterval(progressInterval);
       setDrawProgress(100);
-
-      await new Promise((resolve) => setTimeout(resolve, 500));
 
       setSummary(data.summary || []);
       setProducts(data.updatedProducts || []);
@@ -224,7 +220,7 @@ export function useLuckyDraw({
     (qty: number) => {
       setQuantity(Math.min(qty, totalStock));
     },
-    [totalStock]
+    [totalStock],
   );
 
   /** 수량 직접 설정 */
@@ -232,7 +228,7 @@ export function useLuckyDraw({
     (qty: number) => {
       setQuantity(Math.max(1, Math.min(totalStock, qty)));
     },
-    [totalStock]
+    [totalStock],
   );
 
   return {
