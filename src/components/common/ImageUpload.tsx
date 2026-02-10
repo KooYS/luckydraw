@@ -154,12 +154,16 @@ export default function ImageUpload({
         onClick={() => !value && openFilePicker()}
       >
         {value ? (
-          <div className="relative aspect-square p-2">
+          <div
+            className={`relative p-2 ${previewMode === "cover" ? "aspect-square" : ""}`}
+          >
             <img
               src={value}
               alt="미리보기"
-              className={`w-full h-full rounded-md ${
-                previewMode === "contain" ? "object-contain" : "object-cover"
+              className={`rounded-md ${
+                previewMode === "contain"
+                  ? "max-h-48 w-auto mx-auto"
+                  : "w-full h-full object-cover"
               }`}
             />
             <Button

@@ -4,15 +4,23 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import ImageUpload from "@/components/common/ImageUpload";
-import { ColorPicker, ColorSwatchGroup, ThemePreview } from "@/components/admin/theme";
+import {
+  ColorPicker,
+  ColorSwatchGroup,
+  ThemePreview,
+} from "@/components/admin/theme";
 import type { EventFormState } from "@/hooks/useEventDetail";
 
 interface EventSettingsFormProps {
   form: EventFormState;
   onSubmit: (e: React.FormEvent) => void;
-  updateField: <K extends keyof EventFormState>(field: K, value: EventFormState[K]) => void;
+  updateField: <K extends keyof EventFormState>(
+    field: K,
+    value: EventFormState[K],
+  ) => void;
   isPending: boolean;
 }
 
@@ -47,6 +55,48 @@ export default function EventSettingsForm({
               value={form.name}
               onChange={(e) => updateField("name", e.target.value)}
             />
+            <p className="text-xs text-muted-foreground">
+              * 럭키드로우 페이지에서 제목으로 표시됩니다.
+            </p>
+          </div>
+
+          <div className="space-y-2">
+            <ImageUpload
+              label="타이틀 이미지"
+              value={form.titleImageUrl}
+              onChange={(url) => updateField("titleImageUrl", url)}
+              folder="luckdraw/events/titles"
+              previewMode="contain"
+            />
+            <p className="text-xs text-muted-foreground">
+              * 이미지를 등록하면 텍스트 제목 대신 이미지가 표시됩니다.
+            </p>
+            {form.titleImageUrl && (
+              <div className="space-y-2 rounded-lg border p-4">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="titleImageWidth">이미지 너비</Label>
+                  <span className="text-sm text-muted-foreground font-mono">
+                    {form.titleImageWidth}%
+                  </span>
+                </div>
+                <input
+                  id="titleImageWidth"
+                  type="range"
+                  min={20}
+                  max={100}
+                  step={5}
+                  value={form.titleImageWidth}
+                  onChange={(e) =>
+                    updateField("titleImageWidth", Number(e.target.value))
+                  }
+                  className="w-full accent-primary"
+                />
+                <div className="flex justify-between text-xs text-muted-foreground">
+                  <span>20%</span>
+                  <span>100%</span>
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -109,7 +159,7 @@ export default function EventSettingsForm({
         <CardHeader>
           <CardTitle>배경 이미지</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4">
           <ImageUpload
             label="배경 이미지"
             value={form.posterUrl}
@@ -117,9 +167,50 @@ export default function EventSettingsForm({
             folder="luckdraw/events/backgrounds"
             previewMode="cover"
           />
-          <p className="text-xs text-muted-foreground mt-2">
+          <p className="text-xs text-muted-foreground">
             * 배경 이미지 설정 시 테마 색상 대신 이미지가 표시됩니다.
           </p>
+
+          {form.posterUrl && (
+            <div className="flex items-center justify-between rounded-lg border p-4">
+              <div>
+                <Label htmlFor="posterOverlay">배경 오버레이</Label>
+                <p className="text-xs text-muted-foreground mt-1">
+                  배경 이미지 위에 어두운 오버레이를 표시합니다.
+                </p>
+              </div>
+              <Switch
+                id="posterOverlay"
+                checked={form.posterOverlay}
+                onCheckedChange={(checked) =>
+                  updateField("posterOverlay", checked)
+                }
+              />
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>표시 설정</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-between rounded-lg border p-4">
+            <div>
+              <Label htmlFor="showStockPanel">재고 & 확률 현황 패널</Label>
+              <p className="text-xs text-muted-foreground mt-1">
+                럭키드로우 페이지에 실시간 재고 현황을 표시합니다.
+              </p>
+            </div>
+            <Switch
+              id="showStockPanel"
+              checked={form.showStockPanel}
+              onCheckedChange={(checked) =>
+                updateField("showStockPanel", checked)
+              }
+            />
+          </div>
         </CardContent>
       </Card>
 

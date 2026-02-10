@@ -47,6 +47,8 @@ export const events = mysqlTable('events', {
   // 기본 정보
   name: varchar('name', { length: 255 }).notNull(),
   description: text('description'),
+  titleImageUrl: varchar('title_image_url', { length: 500 }),
+  titleImageWidth: int('title_image_width').default(80).notNull(),
 
   // 테마 설정
   primaryColor: varchar('primary_color', { length: 7 }).default('#c026d3').notNull(),
@@ -58,7 +60,11 @@ export const events = mysqlTable('events', {
 
   // 이미지
   posterUrl: varchar('poster_url', { length: 500 }),
+  posterOverlay: boolean('poster_overlay').default(true).notNull(),
   logoUrl: varchar('logo_url', { length: 500 }),
+
+  // 표시 설정
+  showStockPanel: boolean('show_stock_panel').default(true).notNull(),
 
   // 상태
   isActive: boolean('is_active').default(true).notNull(),

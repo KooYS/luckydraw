@@ -17,6 +17,8 @@ export interface ProductFormState {
 export interface EventFormState {
   name: string;
   description: string;
+  titleImageUrl: string;
+  titleImageWidth: number;
   primaryColor: string;
   secondaryColor: string;
   backgroundColor: string;
@@ -24,6 +26,8 @@ export interface EventFormState {
   subTextColor: string;
   accentColor: string;
   posterUrl: string;
+  posterOverlay: boolean;
+  showStockPanel: boolean;
 }
 
 /** 확률이 포함된 상품 타입 */
@@ -47,6 +51,8 @@ const INITIAL_PRODUCT_FORM: ProductFormState = {
 const INITIAL_EVENT_FORM: EventFormState = {
   name: "",
   description: "",
+  titleImageUrl: "",
+  titleImageWidth: 80,
   primaryColor: "#c026d3",
   secondaryColor: "#701a75",
   backgroundColor: "#fdf4ff",
@@ -54,6 +60,8 @@ const INITIAL_EVENT_FORM: EventFormState = {
   subTextColor: "#6b7280",
   accentColor: "#e879f9",
   posterUrl: "",
+  posterOverlay: true,
+  showStockPanel: true,
 };
 
 /** 이벤트 상세 훅 반환 타입 */
@@ -148,6 +156,8 @@ export function useEventDetail(eventId: string): UseEventDetailReturn {
       setEventForm({
         name: event.name || "",
         description: event.description || "",
+        titleImageUrl: event.titleImageUrl || "",
+        titleImageWidth: event.titleImageWidth ?? 80,
         primaryColor: event.primaryColor || "#c026d3",
         secondaryColor: event.secondaryColor || "#701a75",
         backgroundColor: event.backgroundColor || "#fdf4ff",
@@ -155,6 +165,8 @@ export function useEventDetail(eventId: string): UseEventDetailReturn {
         subTextColor: event.subTextColor || "#6b7280",
         accentColor: event.accentColor || "#e879f9",
         posterUrl: event.posterUrl || "",
+        posterOverlay: event.posterOverlay ?? true,
+        showStockPanel: event.showStockPanel ?? true,
       });
       setIsEventFormInitialized(true);
     }

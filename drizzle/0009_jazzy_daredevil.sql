@@ -1,0 +1,1 @@
+ALTER TABLE `events` ADD `show_stock_panel` boolean DEFAULT true NOT NULL;

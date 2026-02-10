@@ -1,0 +1,1 @@
+ALTER TABLE `events` ADD `title_image_width` int DEFAULT 80 NOT NULL;
