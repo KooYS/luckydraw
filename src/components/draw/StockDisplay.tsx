@@ -32,7 +32,7 @@ export default function StockDisplay({
 }: StockDisplayProps) {
   return (
     <div
-      className="mt-8 p-4 rounded-xl backdrop-blur"
+      className="p-4 rounded-xl backdrop-blur"
       style={{ backgroundColor: colors.infoBg }}
     >
       <div className="flex justify-between items-center mb-3">
@@ -55,7 +55,7 @@ export default function StockDisplay({
               className="rounded-lg overflow-hidden"
               style={{ backgroundColor: colors.cardBg }}
             >
-              <div className="flex items-center justify-between px-3 py-2">
+              <div className="flex items-center justify-between px-3 py-[4px]">
                 <span
                   className="text-sm font-medium"
                   style={{
@@ -93,7 +93,7 @@ export default function StockDisplay({
                 </div>
               </div>
               <div
-                className="h-2 w-full"
+                className="h-1 w-full"
                 style={{ backgroundColor: `${colors.textColorFaint}30` }}
               >
                 <div

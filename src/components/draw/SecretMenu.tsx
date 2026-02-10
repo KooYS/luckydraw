@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { Maximize, Minimize, Settings } from "lucide-react";
 
 interface SecretMenuProps {
   isFullscreen: boolean;
@@ -51,7 +52,7 @@ export default function SecretMenu({
             }}
             className="w-full px-4 py-3 text-left text-sm text-white hover:bg-white/10 transition flex items-center gap-3"
           >
-            <span className="text-base">{isFullscreen ? "⊡" : "⊞"}</span>
+            {isFullscreen ? <Minimize size={16} /> : <Maximize size={16} />}
             {isFullscreen ? "전체화면 해제" : "전체화면"}
           </button>
           <div className="border-t border-white/10" />
@@ -62,7 +63,7 @@ export default function SecretMenu({
             }}
             className="w-full px-4 py-3 text-left text-sm text-white hover:bg-white/10 transition flex items-center gap-3"
           >
-            <span className="text-base">⚙</span>
+            <Settings size={16} />
             관리자 화면
           </button>
         </div>

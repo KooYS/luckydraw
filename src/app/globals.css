@@ -66,6 +66,17 @@ input[type="number"] {
   --color-event-accent: var(--event-accent);
 }
 
+/* 드로우 페이지 전체화면 모드: body 스크롤 제거 */
+html:has(.draw-fullscreen),
+html:has(.draw-fullscreen) body {
+  overflow: hidden;
+  inset: 0;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+}
+
 /* 아이패드 터치 최적화 */
 button,
 a,
@@ -262,4 +273,3 @@ a,
     @apply bg-background text-foreground;
   }
 }
-
