@@ -190,7 +190,7 @@ export default function DrawPage() {
         )}
 
         {state.drawState === "result" && (
-          <div className="w-full max-w-lg">
+          <div className="w-full max-w-lg landscape:max-w-3xl">
             <DrawResult
               summary={state.summary}
               primaryColor={event.primaryColor}
