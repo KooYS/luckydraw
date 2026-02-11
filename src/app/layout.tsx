@@ -1,7 +1,14 @@
 import type { Metadata, Viewport } from "next";
+import localFont from "next/font/local";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import QueryProvider from "@/components/providers/QueryProvider";
 import "./globals.css";
+
+const moneygraphyPixel = localFont({
+  src: "../../public/fonts/Moneygraphy-Pixel.ttf",
+  variable: "--font-moneygraphy",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "LuckyDraw",
@@ -23,7 +30,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko">
-      <body className="min-h-screen">
+      <body className={`min-h-screen ${moneygraphyPixel.variable} font-moneygraphy`}>
         <ThemeProvider>
           <QueryProvider>{children}</QueryProvider>
         </ThemeProvider>

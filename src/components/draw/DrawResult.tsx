@@ -12,7 +12,6 @@ interface DrawSummary {
 
 interface DrawResultProps {
   summary: DrawSummary[];
-  hasPoster: boolean;
   primaryColor: string;
   onReset: () => void;
   colors: {
@@ -27,7 +26,6 @@ interface DrawResultProps {
 /** 추첨 결과 컴포넌트 */
 export default function DrawResult({
   summary,
-  hasPoster,
   primaryColor,
   onReset,
   colors,
@@ -36,7 +34,7 @@ export default function DrawResult({
     <div className="space-y-6">
       <h2
         className="text-2xl font-bold"
-        style={{ color: hasPoster ? "#fff" : primaryColor }}
+        style={{ color: colors.textColor }}
       >
         추첨 결과
       </h2>
@@ -73,7 +71,7 @@ export default function DrawResult({
               </div>
               <span
                 className="text-xl font-bold px-4 py-1 rounded-full"
-                style={{ backgroundColor: primaryColor, color: "#fff" }}
+                style={{ backgroundColor: primaryColor, color: colors.textColorMuted }}
               >
                 x {item.count}
               </span>
@@ -89,7 +87,7 @@ export default function DrawResult({
       <button
         onClick={onReset}
         className="w-full py-4 rounded-2xl font-bold text-lg transition"
-        style={{ backgroundColor: primaryColor, color: "#fff" }}
+        style={{ backgroundColor: primaryColor, color: colors.textColorMuted }}
       >
         다시 추첨하기
       </button>

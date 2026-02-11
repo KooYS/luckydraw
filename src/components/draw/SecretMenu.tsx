@@ -35,7 +35,7 @@ export default function SecretMenu({
   }, [open]);
 
   return (
-    <div ref={menuRef} className="absolute top-0 right-0 z-50">
+    <div ref={menuRef} className="absolute top-0 left-0 z-50">
       {/* 투명한 터치 영역 */}
       <button
         onClick={() => setOpen((prev) => !prev)}
@@ -44,7 +44,7 @@ export default function SecretMenu({
       />
 
       {open && (
-        <div className="absolute top-2 right-2 bg-black/80 backdrop-blur-md rounded-xl shadow-2xl overflow-hidden min-w-[180px] animate-in fade-in slide-in-from-top-2 duration-150">
+        <div className="absolute top-2 left-2 bg-black/80 backdrop-blur-md rounded-xl shadow-2xl overflow-hidden min-w-[180px] animate-in fade-in slide-in-from-top-2 duration-150">
           <button
             onClick={() => {
               onToggleFullscreen();

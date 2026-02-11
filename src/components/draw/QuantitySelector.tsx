@@ -36,7 +36,7 @@ export default function QuantitySelector({
       style={{ backgroundColor: colors.cardBg }}
     >
       <h2
-        className="text-lg font-bold mb-4"
+        className="text-lg text-center font-bold mb-4"
         style={{ color: colors.textColor }}
       >
         럭키드로우 수량 선택

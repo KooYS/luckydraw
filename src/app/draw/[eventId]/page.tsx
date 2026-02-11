@@ -8,8 +8,9 @@ import DrawButton from "@/components/draw/DrawButton";
 import QuantitySelector from "@/components/draw/QuantitySelector";
 import DrawProgress from "@/components/draw/DrawProgress";
 import DrawResult from "@/components/draw/DrawResult";
-import StockDisplay from "@/components/draw/StockDisplay";
+import StockDrawer from "@/components/draw/StockDrawer";
 import SecretMenu from "@/components/draw/SecretMenu";
+import { useStockDrawerStore } from "@/stores/useStockDrawerStore";
 
 /** 럭키드로우 페이지 */
 export default function DrawPage() {
@@ -19,6 +20,7 @@ export default function DrawPage() {
   const { setTheme } = useTheme();
   const mainRef = useRef<HTMLElement>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const drawerInset = useStockDrawerStore((s) => s.inset);
 
   const { state, computed, actions } = useLuckyDraw({
     eventId,
@@ -91,6 +93,18 @@ export default function DrawPage() {
         <div className="absolute inset-0 bg-black/50 z-0" />
       )}
 
+      {/* 재고 현황 사이드 드로어 (핀 고정 시 추첨 중/결과에서도 유지) */}
+      {showStock && (state.drawState === "select" || drawerInset.right > 0 || drawerInset.bottom > 0) && (
+        <StockDrawer
+          products={productsWithProbability}
+          totalStock={totalStock}
+          primaryColor={event.primaryColor}
+          accentColor={event.accentColor}
+          secondaryColor={event.secondaryColor}
+          colors={colors}
+        />
+      )}
+
       <SecretMenu
         isFullscreen={isFullscreen}
         onToggleFullscreen={toggleFullscreen}
@@ -98,7 +112,13 @@ export default function DrawPage() {
       />
 
       {/* 메인 콘텐츠 영역 */}
-      <div className="relative z-10 flex-1 flex items-center justify-center px-4 pb-3 min-h-0">
+      <div
+        className="relative z-10 flex-1 flex items-center justify-center px-4 pb-3 min-h-0 transition-all duration-300"
+        style={{
+          paddingRight: `${drawerInset.right + 16}px`,
+          paddingBottom: `${drawerInset.bottom + 12}px`,
+        }}
+      >
         {state.drawState === "select" && (
           <div className="w-full max-w-4xl">
             {/* 타이틀 영역 */}
@@ -122,20 +142,15 @@ export default function DrawPage() {
               ) : (
                 <h1
                   className="text-2xl font-bold"
-                  style={{ color: hasPoster ? "#fff" : event.primaryColor }}
+                  style={{ color: colors.textColor }}
                 >
                   {event.name}
                 </h1>
               )}
             </div>
 
-            <div
-              className={`flex flex-col landscape:flex-row ${showStock ? "gap-4 landscape:gap-6" : ""} landscape:items-stretch justify-around`}
-            >
             {/* 수량 선택 + 추첨 버튼 */}
-            <div
-              className={`flex flex-col justify-center gap-4 ${showStock ? "landscape:flex-1 landscape:max-w-1/2" : "max-w-lg mx-auto w-full"}`}
-            >
+            <div className="flex flex-col justify-center gap-4 max-w-lg mx-auto w-full">
               <QuantitySelector
                 quantity={state.quantity}
                 maxQuantity={totalStock}
@@ -151,6 +166,7 @@ export default function DrawPage() {
                 onClick={actions.executeDraw}
                 disabled={!hasStock}
                 color={event.primaryColor}
+                textColor={event.subTextColor}
                 label={`${state.quantity}개 추첨하기`}
               />
 
@@ -160,21 +176,6 @@ export default function DrawPage() {
                 </p>
               )}
             </div>
-
-            {/* 재고 현황 */}
-            {showStock && (
-              <div className="landscape:min-w-2/5 flex flex-col justify-center min-h-0">
-                <StockDisplay
-                  products={productsWithProbability}
-                  totalStock={totalStock}
-                  primaryColor={event.primaryColor}
-                  accentColor={event.accentColor}
-                  secondaryColor={event.secondaryColor}
-                  colors={colors}
-                />
-              </div>
-            )}
-            </div>
           </div>
         )}
 
@@ -182,7 +183,6 @@ export default function DrawPage() {
           <div className="text-center">
             <DrawProgress
               quantity={state.quantity}
-              hasPoster={hasPoster}
               primaryColor={event.primaryColor}
               colors={colors}
             />
@@ -193,7 +193,6 @@ export default function DrawPage() {
           <div className="w-full max-w-lg">
             <DrawResult
               summary={state.summary}
-              hasPoster={hasPoster}
               primaryColor={event.primaryColor}
               onReset={actions.reset}
               colors={colors}

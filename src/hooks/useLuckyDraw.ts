@@ -127,16 +127,12 @@ export function useLuckyDraw({
   const productsWithProbability = calculateRealTimeProbabilities();
   const hasPoster = !!event?.posterUrl;
 
-  /** 포스터 유무에 따른 색상 계산 */
+  /** 관리자 설정 색상 + 포스터 유무에 따른 배경 계산 */
   const colors: DrawPageColors = event
     ? {
-        textColor: hasPoster ? "#ffffff" : event.textColor,
-        textColorMuted: hasPoster
-          ? "rgba(255,255,255,0.7)"
-          : event.subTextColor,
-        textColorFaint: hasPoster
-          ? "rgba(255,255,255,0.5)"
-          : event.subTextColor,
+        textColor: event.textColor,
+        textColorMuted: event.subTextColor,
+        textColorFaint: `${event.subTextColor}80`,
         cardBg: hasPoster ? "rgba(255,255,255,0.1)" : `${event.accentColor}20`,
         cardBgHover: hasPoster
           ? "rgba(255,255,255,0.2)"

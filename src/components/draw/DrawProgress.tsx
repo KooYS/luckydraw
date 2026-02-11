@@ -2,9 +2,9 @@
 
 interface DrawProgressProps {
   quantity: number;
-  hasPoster: boolean;
   primaryColor: string;
   colors: {
+    textColor: string;
     textColorMuted: string;
     buttonBg: string;
   };
@@ -13,7 +13,6 @@ interface DrawProgressProps {
 /** 추첨 진행 상태 컴포넌트 */
 export default function DrawProgress({
   quantity,
-  hasPoster,
   primaryColor,
   colors,
 }: DrawProgressProps) {
@@ -25,7 +24,7 @@ export default function DrawProgress({
       />
       <p
         className="mt-6 text-2xl font-bold animate-pulse"
-        style={{ color: hasPoster ? "#fff" : primaryColor }}
+        style={{ color: colors.textColor }}
       >
         {quantity}개 추첨 중...
       </p>
