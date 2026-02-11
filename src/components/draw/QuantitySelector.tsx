@@ -85,6 +85,16 @@ export default function QuantitySelector({
             {n}개
           </button>
         ))}
+        <button
+          onClick={() => onChange(1)}
+          className="px-4 py-2 rounded-lg text-sm font-medium transition border"
+          style={{
+            backgroundColor: colors.buttonBg,
+            color: colors.textColor,
+          }}
+        >
+          초기화
+        </button>
       </div>
     </div>
   );
