@@ -94,16 +94,19 @@ export default function DrawPage() {
       )}
 
       {/* 재고 현황 사이드 드로어 (핀 고정 시 추첨 중/결과에서도 유지) */}
-      {showStock && (state.drawState === "select" || drawerInset.right > 0 || drawerInset.bottom > 0) && (
-        <StockDrawer
-          products={productsWithProbability}
-          totalStock={totalStock}
-          primaryColor={event.primaryColor}
-          accentColor={event.accentColor}
-          secondaryColor={event.secondaryColor}
-          colors={colors}
-        />
-      )}
+      {showStock &&
+        (state.drawState === "select" ||
+          drawerInset.right > 0 ||
+          drawerInset.bottom > 0) && (
+          <StockDrawer
+            products={productsWithProbability}
+            totalStock={totalStock}
+            primaryColor={event.primaryColor}
+            accentColor={event.accentColor}
+            secondaryColor={event.secondaryColor}
+            colors={colors}
+          />
+        )}
 
       <SecretMenu
         isFullscreen={isFullscreen}
@@ -121,36 +124,34 @@ export default function DrawPage() {
       >
         {state.drawState === "select" && (
           <div className="w-full max-w-4xl">
-            {/* 타이틀 영역 */}
-            <div className="pb-3 text-center">
-              {event.titleImageUrl ? (
-                <img
-                  src={event.titleImageUrl}
-                  alt={event.name}
-                  className="mx-auto object-contain"
-                  style={{
-                    width: `${event.titleImageWidth ?? 80}%`,
-                    maxHeight: "15vh",
-                  }}
-                />
-              ) : event.logoUrl ? (
-                <img
-                  src={event.logoUrl}
-                  alt={event.name}
-                  className="h-10 mx-auto"
-                />
-              ) : (
-                <h1
-                  className="text-2xl font-bold"
-                  style={{ color: colors.textColor }}
-                >
-                  {event.name}
-                </h1>
-              )}
-            </div>
-
             {/* 수량 선택 + 추첨 버튼 */}
             <div className="flex flex-col justify-center gap-4 max-w-lg mx-auto w-full">
+              {/* 타이틀 영역 */}
+              <div className="pb-3 text-center">
+                {event.titleImageUrl ? (
+                  <img
+                    src={event.titleImageUrl}
+                    alt={event.name}
+                    className="mx-auto object-contain"
+                    style={{
+                      width: `${event.titleImageWidth ?? 80}%`,
+                    }}
+                  />
+                ) : event.logoUrl ? (
+                  <img
+                    src={event.logoUrl}
+                    alt={event.name}
+                    className="h-10 mx-auto"
+                  />
+                ) : (
+                  <h1
+                    className="text-2xl font-bold"
+                    style={{ color: colors.textColor }}
+                  >
+                    {event.name}
+                  </h1>
+                )}
+              </div>
               <QuantitySelector
                 quantity={state.quantity}
                 maxQuantity={totalStock}

@@ -63,7 +63,7 @@ export default function DrawResult({
                       className="w-10 h-10 rounded-lg flex items-center justify-center text-2xl"
                       style={{ backgroundColor: colors.buttonBg }}
                     >
-                      🎁
+                      ⭐️
                     </div>
                   )}
                   <span
