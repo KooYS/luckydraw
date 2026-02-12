@@ -44,11 +44,11 @@ export default function DrawResult({
         style={{ backgroundColor: colors.cardBg }}
       >
         {summary.length > 0 ? (
-          <div className="grid grid-cols-1 landscape:grid-cols-2 gap-2">
+          <div className="columns-1 landscape:columns-2 gap-2">
             {summary.map((item, idx) => (
               <div
                 key={idx}
-                className="flex items-center justify-between rounded-xl p-2"
+                className="flex items-center justify-between rounded-xl p-2 mb-2 break-inside-avoid"
                 style={{ backgroundColor: colors.cardBgHover }}
               >
                 <div className="flex items-center gap-3">
