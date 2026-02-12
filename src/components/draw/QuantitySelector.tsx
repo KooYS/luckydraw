@@ -86,7 +86,7 @@ export default function QuantitySelector({
           </button>
         ))}
         <button
-          onClick={() => onChange(1)}
+          onClick={() => onChange(0)}
           className="px-4 py-2 rounded-lg text-sm font-medium transition border"
           style={{
             backgroundColor: colors.buttonBg,
