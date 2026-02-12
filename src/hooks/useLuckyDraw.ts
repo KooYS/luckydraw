@@ -194,12 +194,12 @@ export function useLuckyDraw({
 
   /** 수량 증가 */
   const incrementQuantity = useCallback(() => {
-    setQuantity((prev) => Math.min(100, totalStock, prev + 1));
+    setQuantity((prev) => Math.min(10000, totalStock, prev + 1));
   }, [totalStock]);
 
   /** 수량 감소 */
   const decrementQuantity = useCallback(() => {
-    setQuantity((prev) => Math.max(1, prev - 1));
+    setQuantity((prev) => Math.max(0, prev - 1));
   }, []);
 
   /** 빠른 수량 선택 */
@@ -213,7 +213,7 @@ export function useLuckyDraw({
   /** 수량 직접 설정 */
   const handleSetQuantity = useCallback(
     (qty: number) => {
-      setQuantity(Math.max(1, Math.min(totalStock, qty)));
+      setQuantity(Math.max(0, Math.min(totalStock, qty)));
     },
     [totalStock],
   );
