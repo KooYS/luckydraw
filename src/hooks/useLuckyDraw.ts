@@ -189,7 +189,7 @@ export function useLuckyDraw({
   const reset = useCallback(() => {
     setDrawState("select");
     setSummary([]);
-    setQuantity(1);
+    setQuantity(0);
   }, []);
 
   /** 수량 증가 */
