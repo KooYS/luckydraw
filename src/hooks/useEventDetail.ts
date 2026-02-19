@@ -4,6 +4,12 @@ import { useState, useCallback, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Event, Product } from "@/db/schema";
 
+/** API에서 반환하는 이벤트 타입 (adminPassword 대신 hasPassword/isAuthenticated 포함) */
+type EventResponse = Omit<Event, "adminPassword"> & {
+  hasPassword: boolean;
+  isAuthenticated: boolean;
+};
+
 /** 상품 폼 상태 타입 */
 export interface ProductFormState {
   name: string;
@@ -28,6 +34,8 @@ export interface EventFormState {
   posterUrl: string;
   posterOverlay: boolean;
   showStockPanel: boolean;
+  passwordProtected: boolean;
+  adminPassword: string;
 }
 
 /** 확률이 포함된 상품 타입 */
@@ -62,12 +70,14 @@ const INITIAL_EVENT_FORM: EventFormState = {
   posterUrl: "",
   posterOverlay: true,
   showStockPanel: true,
+  passwordProtected: false,
+  adminPassword: "",
 };
 
 /** 이벤트 상세 훅 반환 타입 */
 interface UseEventDetailReturn {
   state: {
-    event: Event | undefined;
+    event: EventResponse | undefined;
     products: Product[];
     loading: boolean;
     error: boolean;
@@ -108,7 +118,7 @@ interface UseEventDetailReturn {
 }
 
 /** API 함수 */
-const fetchEvent = async (id: string): Promise<Event> => {
+const fetchEvent = async (id: string): Promise<EventResponse> => {
   const res = await fetch(`/api/events/${id}`);
   if (!res.ok) throw new Error("Failed to fetch event");
   return res.json();
@@ -167,6 +177,8 @@ export function useEventDetail(eventId: string): UseEventDetailReturn {
         posterUrl: event.posterUrl || "",
         posterOverlay: event.posterOverlay ?? true,
         showStockPanel: event.showStockPanel ?? true,
+        passwordProtected: event.hasPassword ?? false,
+        adminPassword: "",
       });
       setIsEventFormInitialized(true);
     }
@@ -429,7 +441,19 @@ export function useEventDetail(eventId: string): UseEventDetailReturn {
   const saveEventSettings = useCallback(
     (e: React.FormEvent) => {
       e.preventDefault();
-      updateEventMutation.mutate(eventForm, {
+
+      // passwordProtected/adminPassword는 별도 처리
+      const { passwordProtected, adminPassword, ...formData } = eventForm;
+
+      // 패스워드 로직: off → null(제거), on + 입력값 → 설정, on + 빈값 → 기존 유지(전송 안함)
+      const updateData: Record<string, unknown> = { ...formData };
+      if (!passwordProtected) {
+        updateData.adminPassword = null;
+      } else if (adminPassword) {
+        updateData.adminPassword = adminPassword;
+      }
+
+      updateEventMutation.mutate(updateData as Partial<Event>, {
         onSuccess: () => alert("설정이 저장되었습니다."),
         onError: () => alert("저장에 실패했습니다."),
       });

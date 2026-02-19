@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { eventRepository } from '@/repository'
 
 interface RouteParams {
@@ -6,7 +6,7 @@ interface RouteParams {
 }
 
 // GET /api/events/:id - 특정 이벤트 조회
-export async function GET(request: Request, { params }: RouteParams) {
+export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
     const { id } = await params
     const eventId = parseInt(id)
@@ -20,7 +20,19 @@ export async function GET(request: Request, { params }: RouteParams) {
       )
     }
 
-    return NextResponse.json(event)
+    const hasPassword = !!event.adminPassword
+    const isAuthenticated = hasPassword
+      ? request.cookies.get(`event_auth_${eventId}`)?.value === 'true'
+      : true
+
+    // adminPassword 값 자체는 클라이언트에 노출하지 않음
+    const { adminPassword: _, ...eventData } = event
+
+    return NextResponse.json({
+      ...eventData,
+      hasPassword,
+      isAuthenticated,
+    })
   } catch (error) {
     console.error('Failed to fetch event:', error)
     return NextResponse.json(
@@ -39,8 +51,34 @@ export async function PATCH(request: Request, { params }: RouteParams) {
 
     await eventRepository.update(eventId, body)
 
-    // 수정된 이벤트 반환
+    // 수정된 이벤트 반환 (adminPassword 제외)
     const updatedEvent = await eventRepository.findById(eventId)
+    if (updatedEvent) {
+      const { adminPassword: _, ...eventData } = updatedEvent
+      const hasPassword = !!updatedEvent.adminPassword
+
+      const response = NextResponse.json({
+        ...eventData,
+        hasPassword,
+        isAuthenticated: true,
+      })
+
+      // 패스워드가 설정된 경우 인증 쿠키도 함께 설정 (관리자가 잠기지 않도록)
+      if (hasPassword) {
+        response.cookies.set(`event_auth_${eventId}`, 'true', {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'lax',
+          path: '/',
+          maxAge: 60 * 60 * 24 * 7, // 7일
+        })
+      } else {
+        // 패스워드가 제거된 경우 쿠키도 삭제
+        response.cookies.delete(`event_auth_${eventId}`)
+      }
+
+      return response
+    }
     return NextResponse.json(updatedEvent)
   } catch (error) {
     console.error('Failed to update event:', error)

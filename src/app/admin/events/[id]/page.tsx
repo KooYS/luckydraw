@@ -1,9 +1,12 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -13,9 +16,85 @@ import ProductListCard from "@/components/admin/ProductListCard";
 import ProductFormDialog from "@/components/admin/ProductFormDialog";
 import EventSettingsForm from "@/components/admin/EventSettingsForm";
 
+/** 이벤트 패스워드 게이트 */
+function EventPasswordGate({
+  eventId,
+  eventName,
+  onSuccess,
+}: {
+  eventId: string;
+  eventName: string;
+  onSuccess: () => void;
+}) {
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+
+    try {
+      const res = await fetch(`/api/admin/events/${eventId}/verify`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password }),
+      });
+
+      if (res.ok) {
+        onSuccess();
+      } else {
+        const data = await res.json();
+        setError(data.error || "인증에 실패했습니다.");
+      }
+    } catch {
+      setError("서버 오류가 발생했습니다.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <main className="min-h-screen flex items-center justify-center bg-muted/40 p-4">
+      <Card className="w-full max-w-sm">
+        <CardHeader>
+          <CardTitle className="text-center text-xl">
+            {eventName}
+          </CardTitle>
+          <p className="text-sm text-muted-foreground text-center">
+            이 이벤트는 패스워드로 보호되어 있습니다.
+          </p>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+            <Input
+              type="password"
+              placeholder="패스워드를 입력하세요"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              autoFocus
+            />
+            {error && (
+              <p className="text-sm text-destructive text-center">{error}</p>
+            )}
+            <Button type="submit" disabled={loading || !password}>
+              {loading ? "확인 중..." : "확인"}
+            </Button>
+            <Button variant="ghost" asChild>
+              <Link href="/admin">← 대시보드로</Link>
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
+    </main>
+  );
+}
+
 /** 이벤트 상세 페이지 */
 export default function EventDetailPage() {
   const params = useParams();
+  const queryClient = useQueryClient();
   const id = params.id as string;
 
   const { state, computed, actions, pending } = useEventDetail(id);
@@ -37,6 +116,17 @@ export default function EventDetailPage() {
   }
 
   const { event } = state;
+
+  // 패스워드 보호 이벤트 + 미인증 상태
+  if (event.hasPassword && !event.isAuthenticated) {
+    return (
+      <EventPasswordGate
+        eventId={id}
+        eventName={event.name}
+        onSuccess={() => queryClient.invalidateQueries({ queryKey: ["event", id] })}
+      />
+    );
+  }
 
   return (
     <main className="min-h-screen p-8 bg-muted/40">

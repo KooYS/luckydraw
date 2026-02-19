@@ -214,6 +214,45 @@ export default function EventSettingsForm({
         </CardContent>
       </Card>
 
+      <Card>
+        <CardHeader>
+          <CardTitle>접근 제한</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center justify-between rounded-lg border p-4">
+            <div>
+              <Label htmlFor="passwordProtected">패스워드 보호</Label>
+              <p className="text-xs text-muted-foreground mt-1">
+                이 이벤트의 관리 페이지에 접근 시 패스워드를 요구합니다.
+              </p>
+            </div>
+            <Switch
+              id="passwordProtected"
+              checked={form.passwordProtected}
+              onCheckedChange={(checked) => {
+                updateField("passwordProtected", checked);
+                if (!checked) updateField("adminPassword", "");
+              }}
+            />
+          </div>
+          {form.passwordProtected && (
+            <div className="space-y-2">
+              <Label htmlFor="adminPassword">패스워드</Label>
+              <Input
+                id="adminPassword"
+                type="password"
+                placeholder="새 패스워드 입력 (빈칸이면 기존 유지)"
+                value={form.adminPassword}
+                onChange={(e) => updateField("adminPassword", e.target.value)}
+              />
+              <p className="text-xs text-muted-foreground">
+                * 이미 패스워드가 설정된 경우 빈칸으로 두면 기존 패스워드가 유지됩니다.
+              </p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
       <Button type="submit" disabled={isPending} className="w-full">
         {isPending ? "저장 중..." : "설정 저장"}
       </Button>
