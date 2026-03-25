@@ -51,6 +51,7 @@ interface UseAdminDashboardReturn {
   actions: {
     setActiveTab: (tab: string) => void;
     deleteEvent: (id: number) => void;
+    copyEvent: (id: number) => void;
     toggleEvent: (id: number, isActive: boolean) => void;
     openAccountForm: () => void;
     closeAccountForm: () => void;
@@ -63,6 +64,7 @@ interface UseAdminDashboardReturn {
   };
   pending: {
     deleteEvent: boolean;
+    copyEvent: boolean;
     toggleEvent: boolean;
     addAccount: boolean;
     updateAccount: boolean;
@@ -100,6 +102,22 @@ export function useAdminDashboard(): UseAdminDashboardReturn {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["events"] });
       toast("이벤트가 삭제되었습니다.", { type: "success" });
+    },
+  });
+
+  /** 이벤트 복사 */
+  const copyEventMutation = useMutation({
+    mutationFn: async (id: number) => {
+      const res = await fetch(`/api/events/${id}/copy`, { method: "POST" });
+      if (!res.ok) throw new Error("Failed to copy event");
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["events"] });
+      toast("이벤트가 복사되었습니다.", { type: "success" });
+    },
+    onError: () => {
+      toast("이벤트 복사에 실패했습니다.", { type: "error" });
     },
   });
 
@@ -283,6 +301,7 @@ export function useAdminDashboard(): UseAdminDashboardReturn {
     actions: {
       setActiveTab,
       deleteEvent: handleDeleteEvent,
+      copyEvent: (id: number) => copyEventMutation.mutate(id),
       toggleEvent: (id, isActive) => toggleEventMutation.mutate({ id, isActive }),
       openAccountForm,
       closeAccountForm: resetAccountForm,
@@ -295,6 +314,7 @@ export function useAdminDashboard(): UseAdminDashboardReturn {
     },
     pending: {
       deleteEvent: deleteEventMutation.isPending,
+      copyEvent: copyEventMutation.isPending,
       toggleEvent: toggleEventMutation.isPending,
       addAccount: addAccountMutation.isPending,
       updateAccount: updateAccountMutation.isPending,

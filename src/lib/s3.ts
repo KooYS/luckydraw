@@ -23,7 +23,20 @@ const ALLOWED_IMAGE_TYPES = [
   "image/svg+xml",
 ] as const;
 
+const ALLOWED_FONT_TYPES = [
+  "font/woff",
+  "font/woff2",
+  "font/ttf",
+  "font/otf",
+  "application/font-woff",
+  "application/font-woff2",
+  "application/x-font-ttf",
+  "application/x-font-opentype",
+  "application/octet-stream", // 일부 브라우저에서 폰트 파일을 이 타입으로 전송
+] as const;
+
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
+const MAX_FONT_SIZE = 10 * 1024 * 1024;
 
 export interface UploadOptions {
   folder?: string;
@@ -100,6 +113,27 @@ export function validateImageFile(file: File | Blob): ValidationResult {
   return { valid: true };
 }
 
+/** 폰트 파일 유효성 검증 */
+export function validateFontFile(file: File): ValidationResult {
+  if (file.size > MAX_FONT_SIZE) {
+    return {
+      valid: false,
+      error: `파일 크기는 ${MAX_FONT_SIZE / 1024 / 1024}MB를 초과할 수 없습니다.`,
+    };
+  }
+
+  const ext = file.name.split(".").pop()?.toLowerCase();
+  const allowedExts = ["woff", "woff2", "ttf", "otf"];
+  if (!ext || !allowedExts.includes(ext)) {
+    return {
+      valid: false,
+      error: "허용되지 않는 파일 형식입니다. (woff, woff2, ttf, otf)",
+    };
+  }
+
+  return { valid: true };
+}
+
 /** S3 설정 유효성 검증 */
 export function validateS3Config(): ValidationResult {
   if (!S3_CONFIG.bucket) {
@@ -133,6 +167,37 @@ export async function uploadToS3(
   }
 
   const originalName = file instanceof File ? file.name : "image.jpg";
+  const fileName = options.fileName || generateUniqueFileName(originalName);
+  const key = generateObjectKey(fileName, options.folder);
+
+  const arrayBuffer = await file.arrayBuffer();
+  const buffer = Buffer.from(arrayBuffer);
+
+  const client = getS3Client();
+  const command = new PutObjectCommand({
+    Bucket: S3_CONFIG.bucket,
+    Key: key,
+    Body: buffer,
+    ContentType: options.contentType || detectContentType(file),
+    CacheControl: options.cacheControl || "max-age=31536000",
+  });
+
+  await client.send(command);
+
+  return { url: getS3Url(key), key, size: file.size };
+}
+
+/** S3에 파일 직접 업로드 (타입 검증 없이) */
+export async function uploadRawToS3(
+  file: File | Blob,
+  options: UploadOptions = {}
+): Promise<UploadResult> {
+  const configValidation = validateS3Config();
+  if (!configValidation.valid) {
+    throw new Error(configValidation.error);
+  }
+
+  const originalName = file instanceof File ? file.name : "file";
   const fileName = options.fileName || generateUniqueFileName(originalName);
   const key = generateObjectKey(fileName, options.folder);
 

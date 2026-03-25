@@ -52,8 +52,10 @@ export default function AdminDashboard() {
               events={state.events}
               loading={state.eventsLoading}
               onDelete={actions.deleteEvent}
+              onCopy={actions.copyEvent}
               onToggle={actions.toggleEvent}
               deletePending={pending.deleteEvent}
+              copyPending={pending.copyEvent}
               togglePending={pending.toggleEvent}
             />
           </TabsContent>

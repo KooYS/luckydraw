@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import ImageUpload from "@/components/common/ImageUpload";
+import FontUpload from "@/components/common/FontUpload";
 import {
   ColorPicker,
   ColorSwatchGroup,
@@ -188,6 +189,22 @@ export default function EventSettingsForm({
               />
             </div>
           )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>폰트 설정</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <FontUpload
+            label="커스텀 폰트"
+            value={form.fontUrl}
+            onChange={(url) => updateField("fontUrl", url)}
+          />
+          <p className="text-xs text-muted-foreground">
+            * 폰트를 등록하면 추첨 페이지의 텍스트가 해당 폰트로 표시됩니다.
+          </p>
         </CardContent>
       </Card>
 

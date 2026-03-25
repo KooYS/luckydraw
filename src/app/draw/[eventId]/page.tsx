@@ -75,6 +75,7 @@ export default function DrawPage() {
     computed;
 
   const showStock = event.showStockPanel && productsWithProbability.length > 0;
+  const customFontFamily = event.fontUrl ? "CustomEventFont" : undefined;
 
   return (
     <main
@@ -87,8 +88,18 @@ export default function DrawPage() {
           : undefined,
         backgroundSize: "cover",
         backgroundPosition: "center",
+        fontFamily: customFontFamily,
       }}
     >
+      {event.fontUrl && (
+        <style>{`
+          @font-face {
+            font-family: "CustomEventFont";
+            src: url("${event.fontUrl}");
+            font-display: swap;
+          }
+        `}</style>
+      )}
       {hasPoster && event.posterOverlay && (
         <div className="absolute inset-0 bg-black/50 z-0" />
       )}

@@ -9,16 +9,16 @@ class ProductRepository extends BaseRepository<typeof products> {
     super(products);
   }
 
-  /** 이벤트별 상품 조회 */
+  /** 이벤트별 상품 조회 (확률 오름차순: totalQuantity * weight ASC) */
   async findByEventId(eventId: number) {
     return db
       .select()
       .from(this.table)
       .where(and(eq(products.eventId, eventId), this.notDeleted))
-      .orderBy(products.displayOrder);
+      .orderBy(sql`${products.totalQuantity} * ${products.weight} ASC`);
   }
 
-  /** 이벤트별 재고 있는 상품 조회 */
+  /** 이벤트별 재고 있는 상품 조회 (확률 오름차순) */
   async findAvailableByEventId(eventId: number) {
     return db
       .select()
@@ -30,7 +30,7 @@ class ProductRepository extends BaseRepository<typeof products> {
           sql`${products.remainingQuantity} > 0`
         )
       )
-      .orderBy(products.displayOrder);
+      .orderBy(sql`${products.totalQuantity} * ${products.weight} ASC`);
   }
 
   /** 상품 생성 */

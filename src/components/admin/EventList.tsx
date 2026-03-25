@@ -11,8 +11,10 @@ interface EventListProps {
   events: Event[];
   loading: boolean;
   onDelete: (id: number) => void;
+  onCopy: (id: number) => void;
   onToggle: (id: number, isActive: boolean) => void;
   deletePending: boolean;
+  copyPending: boolean;
   togglePending: boolean;
 }
 
@@ -21,8 +23,10 @@ export default function EventList({
   events,
   loading,
   onDelete,
+  onCopy,
   onToggle,
   deletePending,
+  copyPending,
   togglePending,
 }: EventListProps) {
   if (loading) {
@@ -79,6 +83,14 @@ export default function EventList({
               </Button>
               <Button variant="secondary" size="sm" asChild>
                 <Link href={`/draw/${event.id}`}>실행</Link>
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => onCopy(event.id)}
+                disabled={copyPending}
+              >
+                복사
               </Button>
               <Button
                 variant="destructive"

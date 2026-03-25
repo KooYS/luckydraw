@@ -33,6 +33,7 @@ export interface EventFormState {
   accentColor: string;
   posterUrl: string;
   posterOverlay: boolean;
+  fontUrl: string;
   showStockPanel: boolean;
   passwordProtected: boolean;
   adminPassword: string;
@@ -69,6 +70,7 @@ const INITIAL_EVENT_FORM: EventFormState = {
   accentColor: "#e879f9",
   posterUrl: "",
   posterOverlay: true,
+  fontUrl: "",
   showStockPanel: true,
   passwordProtected: false,
   adminPassword: "",
@@ -176,6 +178,7 @@ export function useEventDetail(eventId: string): UseEventDetailReturn {
         accentColor: event.accentColor || "#e879f9",
         posterUrl: event.posterUrl || "",
         posterOverlay: event.posterOverlay ?? true,
+        fontUrl: event.fontUrl || "",
         showStockPanel: event.showStockPanel ?? true,
         passwordProtected: event.hasPassword ?? false,
         adminPassword: "",

@@ -69,6 +69,9 @@ export const events = mysqlTable('events', {
   // 상태
   isActive: boolean('is_active').default(true).notNull(),
 
+  // 커스텀 폰트 (S3 업로드 URL)
+  fontUrl: varchar('font_url', { length: 500 }),
+
   // 관리자 패스워드 (설정 시 상세페이지 접근에 패스워드 필요)
   adminPassword: varchar('admin_password', { length: 255 }),
 })
