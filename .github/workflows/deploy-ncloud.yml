@@ -1,0 +1,63 @@
+name: deploy-ncloud
+
+on:
+  push:
+    branches:
+      - ncloud/migration
+      - main
+  workflow_dispatch: # 수동 트리거
+
+concurrency:
+  # 같은 branch 의 연속 push 시 이전 배포 자동 취소 (rolling deploy 충돌 방지)
+  group: deploy-ncloud-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      # SSH 개인키 셋업 (GitHub Secrets 의 DEPLOY_SSH_KEY 는 PEM 전체 내용)
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+
+      # 서버의 shared/.env 를 secrets 로부터 매번 동기화 (.env 가 source-of-truth = GH Secrets)
+      - name: Sync .env to server
+        env:
+          SERVER_IP: ${{ secrets.LUCKYDRAW_SERVER_IP }}
+          ENV_CONTENT: ${{ secrets.LUCKYDRAW_ENV }}
+        run: |
+          printf '%s' "$ENV_CONTENT" | ssh -o StrictHostKeyChecking=no -i ~/.ssh/deploy_key \
+            root@$SERVER_IP 'cat > /opt/app/shared/config/.env && chmod 600 /opt/app/shared/config/.env'
+
+      # 실제 배포: rsync + npm ci + npm run build + symlink swap + pm2 reload
+      - name: Deploy
+        env:
+          SERVER_IP: ${{ secrets.LUCKYDRAW_SERVER_IP }}
+          SSH_KEY: ~/.ssh/deploy_key
+          RELEASE_DIR: ./
+          APP_NAME: luckydraw
+        run: bash scripts/deploy.sh
+
+      # 헬스체크 — 배포 끝났는지 외부에서 검증
+      - name: Health check
+        run: |
+          for i in {1..10}; do
+            CODE=$(curl -s -o /dev/null -w "%{http_code}" https://luckydraw.duckzill.com/)
+            echo "attempt $i: HTTP $CODE"
+            if [ "$CODE" = "200" ]; then exit 0; fi
+            sleep 3
+          done
+          echo "::error::헬스체크 실패 — luckydraw.duckzill.com 응답 200 아님"
+          exit 1
