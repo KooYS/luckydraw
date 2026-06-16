@@ -21,25 +21,37 @@ class EventRepository extends BaseRepository<typeof events> {
   async createEvent(data: {
     name: string;
     description?: string;
+    titleImageUrl?: string;
+    titleImageWidth?: number;
     primaryColor?: string;
     secondaryColor?: string;
     backgroundColor?: string;
     textColor?: string;
+    subTextColor?: string;
     accentColor?: string;
     posterUrl?: string;
+    posterOverlay?: boolean;
     logoUrl?: string;
+    fontUrl?: string;
+    showStockPanel?: boolean;
     isActive?: boolean;
   }) {
     const [result] = await db.insert(events).values({
       name: data.name,
       description: data.description,
+      titleImageUrl: data.titleImageUrl,
+      titleImageWidth: data.titleImageWidth ?? 80,
       primaryColor: data.primaryColor ?? "#c026d3",
       secondaryColor: data.secondaryColor ?? "#701a75",
       backgroundColor: data.backgroundColor ?? "#fdf4ff",
       textColor: data.textColor ?? "#1f2937",
+      subTextColor: data.subTextColor ?? "#6b7280",
       accentColor: data.accentColor ?? "#e879f9",
       posterUrl: data.posterUrl,
+      posterOverlay: data.posterOverlay ?? true,
       logoUrl: data.logoUrl,
+      fontUrl: data.fontUrl,
+      showStockPanel: data.showStockPanel ?? true,
       isActive: data.isActive ?? true,
     });
     return result;
