@@ -74,8 +74,19 @@ cd ${REMOTE_RELEASE}
 ln -sfn /opt/app/shared/config/.env .env || true
 ln -sfn /opt/app/shared/logs logs || true
 
-npm ci                  # 빌드에 devDeps 가 필요한 케이스 (Next.js typescript 등) 대비, 전체 설치
-npm run build           # Next.js standalone 산출물 / NestJS dist 등 생성. 실패 시 배포 중단
+# 패키지 매니저 자동 감지: pnpm > yarn > npm 순서로 lockfile 검사.
+if [ -f pnpm-lock.yaml ]; then
+    corepack enable >/dev/null 2>&1 || npm i -g pnpm
+    pnpm install --frozen-lockfile
+    pnpm run build
+elif [ -f yarn.lock ]; then
+    corepack enable >/dev/null 2>&1 || npm i -g yarn
+    yarn install --frozen-lockfile
+    yarn build
+else
+    npm ci
+    npm run build
+fi
 
 # 새 릴리스를 current 로 교체 (atomic symlink swap)
 ln -sfn ${REMOTE_RELEASE} /opt/app/current
