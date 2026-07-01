@@ -7,16 +7,15 @@ const COOKIE_NAME = "admin_authenticated";
 // 그대로 리다이렉트하면 브라우저가 localhost 로 튕긴다. 프록시가 넘겨주는
 // x-forwarded-host/proto 로 실제 도메인을 복원해 절대 URL 을 만든다.
 const redirectTo = (request: NextRequest, path: string) => {
+  const forwardedHost = request.headers.get("x-forwarded-host");
+  if (forwardedHost) {
+    const proto = request.headers.get("x-forwarded-proto") ?? "https";
+    return NextResponse.redirect(new URL(path, `${proto}://${forwardedHost}`));
+  }
+
   const url = request.nextUrl.clone();
   url.pathname = path;
   url.search = "";
-
-  const forwardedHost = request.headers.get("x-forwarded-host");
-  if (forwardedHost) {
-    url.host = forwardedHost;
-    url.protocol = request.headers.get("x-forwarded-proto") ?? url.protocol;
-  }
-
   return NextResponse.redirect(url);
 };
 
