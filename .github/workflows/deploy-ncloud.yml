@@ -16,6 +16,9 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    permissions:
+      id-token: write # OIDC 토큰 발급 (AWS role assume)
+      contents: read
 
     steps:
       - uses: actions/checkout@v4
@@ -25,6 +28,12 @@ jobs:
           node-version: 20
           cache: npm
 
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::020329126309:role/prod-duckzill-deploy-luckydraw
+          aws-region: ap-northeast-2
+
       # SSH 개인키 셋업 (GitHub Secrets 의 DEPLOY_SSH_KEY 는 PEM 전체 내용)
       - name: Setup SSH key
         run: |
@@ -32,14 +41,17 @@ jobs:
           echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
 
-      # 서버의 shared/.env 를 secrets 로부터 매번 동기화 (.env 가 source-of-truth = GH Secrets)
-      - name: Sync .env to server
+      # 서버 shared/.env 를 SSM 에서 매번 동기화 (source-of-truth = SSM /duckzill/prod/luckydraw)
+      - name: Sync .env to server (from SSM)
         env:
           SERVER_IP: ${{ secrets.LUCKYDRAW_SERVER_IP }}
-          ENV_CONTENT: ${{ secrets.LUCKYDRAW_ENV }}
         run: |
-          printf '%s' "$ENV_CONTENT" | ssh -o StrictHostKeyChecking=no -i ~/.ssh/deploy_key \
-            root@$SERVER_IP 'cat > /opt/app/shared/config/.env && chmod 600 /opt/app/shared/config/.env'
+          aws ssm get-parameter --name /duckzill/prod/luckydraw --with-decryption \
+            --query Parameter.Value --output text --region ap-northeast-2 > /tmp/env
+          [ -s /tmp/env ] || { echo "SSM value empty — abort"; exit 1; }
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/deploy_key \
+            root@$SERVER_IP 'cat > /opt/app/shared/config/.env && chmod 600 /opt/app/shared/config/.env' < /tmp/env
+          rm -f /tmp/env
 
       # 실제 배포: rsync + npm ci + npm run build + symlink swap + pm2 reload
       - name: Deploy
