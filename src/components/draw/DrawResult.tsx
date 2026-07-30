@@ -1,5 +1,7 @@
 "use client";
 
+import { useLang } from "@/lib/i18n";
+
 interface DrawSummary {
   count: number;
   product: {
@@ -30,13 +32,15 @@ export default function DrawResult({
   onReset,
   colors,
 }: DrawResultProps) {
+  const t = useLang();
+
   return (
     <div className="space-y-6">
       <h2
         className="text-2xl text-center font-bold"
         style={{ color: colors.textColor }}
       >
-        추첨 결과
+        {t.result}
       </h2>
 
       <div
@@ -87,7 +91,7 @@ export default function DrawResult({
           </div>
         ) : (
           <p style={{ color: colors.textColorMuted }}>
-            재고가 없어 당첨 상품이 없습니다.
+            {t.noPrize}
           </p>
         )}
       </div>
@@ -97,7 +101,7 @@ export default function DrawResult({
         className="w-full py-4 rounded-2xl font-bold text-lg transition"
         style={{ backgroundColor: primaryColor, color: colors.textColorMuted }}
       >
-        다시 추첨하기
+        {t.drawAgain}
       </button>
     </div>
   );

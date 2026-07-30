@@ -1,5 +1,7 @@
 "use client";
 
+import { useLang } from "@/lib/i18n";
+
 interface QuantitySelectorProps {
   quantity: number;
   maxQuantity: number;
@@ -28,6 +30,7 @@ export default function QuantitySelector({
   colors,
   primaryColor,
 }: QuantitySelectorProps) {
+  const t = useLang();
   const quickOptions = [1, 5, 10, 20];
 
   return (
@@ -39,7 +42,7 @@ export default function QuantitySelector({
         className="text-lg text-center font-bold mb-4"
         style={{ color: colors.textColor }}
       >
-        럭키드로우 수량 선택
+        {t.selectQuantity}
       </h2>
 
       <div className="flex items-center justify-center gap-4">
@@ -82,7 +85,7 @@ export default function QuantitySelector({
               cursor: n > maxQuantity ? "not-allowed" : "pointer",
             }}
           >
-            {n}개
+            {t.unit(n)}
           </button>
         ))}
         <button
@@ -93,7 +96,7 @@ export default function QuantitySelector({
             color: colors.textColor,
           }}
         >
-          초기화
+          {t.reset}
         </button>
       </div>
     </div>

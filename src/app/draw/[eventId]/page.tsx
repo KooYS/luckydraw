@@ -11,6 +11,7 @@ import DrawResult from "@/components/draw/DrawResult";
 import StockDrawer from "@/components/draw/StockDrawer";
 import SecretMenu from "@/components/draw/SecretMenu";
 import { useStockDrawerStore } from "@/stores/useStockDrawerStore";
+import { useLang } from "@/lib/i18n";
 
 /** 럭키드로우 페이지 */
 export default function DrawPage() {
@@ -21,6 +22,7 @@ export default function DrawPage() {
   const mainRef = useRef<HTMLElement>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const drawerInset = useStockDrawerStore((s) => s.inset);
+  const t = useLang();
 
   const { state, computed, actions } = useLuckyDraw({
     eventId,
@@ -57,7 +59,7 @@ export default function DrawPage() {
   if (state.loading) {
     return (
       <div className="h-dvh flex items-center justify-center bg-theme-background">
-        <div className="text-xl text-theme-text">로딩 중...</div>
+        <div className="text-xl text-theme-text">{t.loading}</div>
       </div>
     );
   }
@@ -65,7 +67,7 @@ export default function DrawPage() {
   if (!state.event) {
     return (
       <div className="h-dvh flex items-center justify-center bg-theme-background">
-        <div className="text-xl text-red-500">이벤트를 찾을 수 없습니다.</div>
+        <div className="text-xl text-red-500">{t.eventNotFound}</div>
       </div>
     );
   }
@@ -179,12 +181,12 @@ export default function DrawPage() {
                 disabled={!hasStock}
                 color={event.primaryColor}
                 textColor={event.subTextColor}
-                label={`${state.quantity}개 추첨하기`}
+                label={t.drawN(state.quantity)}
               />
 
               {!hasStock && (
                 <p className="text-center" style={{ color: "#ef4444" }}>
-                  모든 상품의 재고가 소진되었습니다.
+                  {t.soldOut}
                 </p>
               )}
             </div>

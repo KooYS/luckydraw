@@ -1,5 +1,7 @@
 "use client";
 
+import { useLang } from "@/lib/i18n";
+
 interface DrawProgressProps {
   quantity: number;
   primaryColor: string;
@@ -16,6 +18,8 @@ export default function DrawProgress({
   primaryColor,
   colors,
 }: DrawProgressProps) {
+  const t = useLang();
+
   return (
     <div className="flex flex-col items-center">
       <div
@@ -26,7 +30,7 @@ export default function DrawProgress({
         className="mt-6 text-2xl font-bold animate-pulse"
         style={{ color: colors.textColor }}
       >
-        {quantity}개 추첨 중...
+        {t.drawingN(quantity)}
       </p>
 
       <div className="w-full max-w-xs mt-4">
@@ -40,7 +44,7 @@ export default function DrawProgress({
           />
         </div>
         <p className="text-sm mt-2" style={{ color: colors.textColorMuted }}>
-          추첨 진행 중...
+          {t.drawing}
         </p>
       </div>
     </div>

@@ -4,6 +4,7 @@ import { useEffect, useCallback, useRef } from "react";
 import StockDisplay from "./StockDisplay";
 import { Product } from "@/db/schema";
 import { useStockDrawerStore } from "@/stores/useStockDrawerStore";
+import { useLang } from "@/lib/i18n";
 
 interface ProductWithProbability extends Product {
   realTimeProbability: string;
@@ -37,6 +38,7 @@ export default function StockDrawer({
     setOpen, setPinned, setIsLandscape, setInset, close,
   } = useStockDrawerStore();
 
+  const t = useLang();
   const panelRef = useRef<HTMLDivElement>(null);
 
   // orientation 감지
@@ -76,7 +78,7 @@ export default function StockDrawer({
   const header = (
     <div className="flex items-center justify-between px-4 pt-3 pb-2">
       <span className="text-sm font-semibold" style={{ color: colors.textColor }}>
-        재고 현황
+        {t.stockStatus}
       </span>
       <div className="flex items-center gap-1.5">
         <button

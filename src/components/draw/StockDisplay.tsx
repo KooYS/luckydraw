@@ -1,6 +1,7 @@
 "use client";
 
 import { Product } from "@/db/schema";
+import { useLang } from "@/lib/i18n";
 
 interface ProductWithProbability extends Product {
   realTimeProbability: string;
@@ -30,6 +31,8 @@ export default function StockDisplay({
   secondaryColor,
   colors,
 }: StockDisplayProps) {
+  const t = useLang();
+
   return (
     <div
       className="p-4 rounded-xl backdrop-blur"
@@ -40,10 +43,10 @@ export default function StockDisplay({
           className="text-sm font-medium"
           style={{ color: colors.textColorMuted }}
         >
-          실시간 재고
+          {t.liveStock}
         </h3>
         <span className="text-xs" style={{ color: colors.textColorFaint }}>
-          총 재고: {totalStock}개
+          {t.totalStock(totalStock)}
         </span>
       </div>
       <div className="space-y-3">
