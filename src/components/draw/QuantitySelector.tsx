@@ -29,6 +29,7 @@ export default function QuantitySelector({
   return (
     <div
       className="backdrop-blur rounded-2xl p-6"
+      data-token-part="quantityCard"
       style={{ backgroundColor: colors.quantityCardBg }}
     >
       <h2
@@ -40,7 +41,9 @@ export default function QuantitySelector({
 
       <div className="flex items-center justify-center gap-4">
         <button
+          type="button"
           onClick={onDecrement}
+          data-token-part="stepper"
           className="w-12 h-12 rounded-full text-2xl font-bold transition"
           style={{
             backgroundColor: colors.stepperButtonBg,
@@ -55,11 +58,14 @@ export default function QuantitySelector({
           max={Math.min(100, maxQuantity)}
           value={quantity}
           onChange={(e) => onChange(parseInt(e.target.value) || 1)}
+          data-token-part="quantityInput"
           className="w-20 h-12 text-center text-2xl font-bold rounded-xl border-0"
           style={{ backgroundColor: colors.inputBg, color: colors.inputText }}
         />
         <button
+          type="button"
           onClick={onIncrement}
+          data-token-part="stepper"
           className="w-12 h-12 rounded-full text-2xl font-bold transition"
           style={{
             backgroundColor: colors.stepperButtonBg,
@@ -74,7 +80,9 @@ export default function QuantitySelector({
         {quickOptions.map((n) => (
           <button
             key={n}
+            type="button"
             onClick={() => onQuickIncrement(n)}
+            data-token-part="quickButton"
             disabled={n > maxQuantity}
             className="px-4 py-2 rounded-lg text-sm font-medium transition"
             style={{
@@ -88,7 +96,9 @@ export default function QuantitySelector({
           </button>
         ))}
         <button
+          type="button"
           onClick={() => onChange(0)}
+          data-token-part="resetButton"
           className="px-4 py-2 rounded-lg text-sm font-medium transition border"
           style={{
             backgroundColor: colors.resetButtonBg,

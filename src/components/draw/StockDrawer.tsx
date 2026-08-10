@@ -71,6 +71,7 @@ export default function StockDrawer({
       </span>
       <div className="flex items-center gap-1.5">
         <button
+          type="button"
           onClick={() => setPinned(!pinned)}
           className="p-1.5 rounded-lg transition-colors"
           style={{
@@ -91,6 +92,7 @@ export default function StockDrawer({
           </svg>
         </button>
         <button
+          type="button"
           onClick={handleClose}
           className="p-1.5 rounded-lg transition-colors"
           style={{
@@ -124,6 +126,7 @@ export default function StockDrawer({
     return (
       <>
         <button
+          type="button"
           onClick={() => setOpen(true)}
           className="fixed right-0 top-1/2 -translate-y-1/2 z-40 transition-all duration-300 active:scale-95"
           style={{
@@ -170,6 +173,7 @@ export default function StockDrawer({
   return (
     <>
       <button
+        type="button"
         onClick={() => setOpen(true)}
         className="fixed bottom-0 left-1/2 -translate-x-1/2 z-40 transition-all duration-300 active:scale-95"
         style={{

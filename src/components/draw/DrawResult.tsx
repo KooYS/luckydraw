@@ -30,6 +30,7 @@ export default function DrawResult({
   return (
     <div className="space-y-6">
       <h2
+        data-token-part="resultTitle"
         className="text-2xl text-center font-bold"
         style={{ color: colors.resultTitleText }}
       >
@@ -37,6 +38,7 @@ export default function DrawResult({
       </h2>
 
       <div
+        data-token-part="resultCard"
         className="backdrop-blur rounded-2xl p-3 landscape:p-5 overflow-y-auto max-h-[50vh] landscape:max-h-[60vh]"
         style={{ backgroundColor: colors.resultCardBg }}
       >
@@ -45,6 +47,7 @@ export default function DrawResult({
             {summary.map((item, idx) => (
               <div
                 key={idx}
+                data-token-part="resultRow"
                 className="flex items-center justify-between rounded-xl p-2 mb-2 break-inside-avoid"
                 style={{ backgroundColor: colors.resultRowBg }}
               >
@@ -71,6 +74,7 @@ export default function DrawResult({
                   </span>
                 </div>
                 <span
+                  data-token-part="resultBadge"
                   className="text-lg font-bold px-4 py-1 rounded-full whitespace-nowrap shrink-0"
                   style={{
                     backgroundColor: colors.resultBadgeBg,
@@ -90,7 +94,9 @@ export default function DrawResult({
       </div>
 
       <button
+        type="button"
         onClick={onReset}
+        data-token-part="resultAgainButton"
         className="w-full py-4 rounded-2xl font-bold text-lg transition"
         style={{
           backgroundColor: colors.resultAgainButtonBg,

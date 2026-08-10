@@ -18,10 +18,12 @@ export default function DrawProgress({
   return (
     <div className="flex flex-col items-center">
       <div
+        data-token-part="spinner"
         className="w-32 h-32 rounded-full animate-spin-slow border-4 border-t-transparent"
         style={{ borderColor: `${colors.spinnerColor} transparent` }}
       />
       <p
+        data-token-part="progressLabel"
         className="mt-6 text-2xl font-bold animate-pulse"
         style={{ color: colors.progressText }}
       >
@@ -30,6 +32,7 @@ export default function DrawProgress({
 
       <div className="w-full max-w-xs mt-4">
         <div
+          data-token-part="progressBar"
           className="h-2 rounded-full overflow-hidden relative"
           style={{ backgroundColor: colors.progressTrackBg }}
         >
@@ -38,7 +41,11 @@ export default function DrawProgress({
             style={{ backgroundColor: colors.progressFillBg }}
           />
         </div>
-        <p className="text-sm mt-2" style={{ color: colors.progressSubText }}>
+        <p
+          data-token-part="progressLabel"
+          className="text-sm mt-2"
+          style={{ color: colors.progressSubText }}
+        >
           {t.drawing}
         </p>
       </div>

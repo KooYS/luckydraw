@@ -44,6 +44,52 @@ export const TOKEN_GROUP_LABELS: Record<TokenGroup, string> = {
   subTextColor: "본문 텍스트",
 };
 
+/** 미리보기에서 클릭 가능한 화면 요소. data-token-part 속성값과 1:1 */
+export type TokenPart =
+  | "pageBackground"
+  | "title"
+  | "quantityCard"
+  | "stepper"
+  | "quantityInput"
+  | "quickButton"
+  | "resetButton"
+  | "drawButton"
+  | "stockPanel"
+  | "stockRow"
+  | "stockGauge"
+  | "stockDrawer"
+  | "spinner"
+  | "progressLabel"
+  | "progressBar"
+  | "resultTitle"
+  | "resultCard"
+  | "resultRow"
+  | "resultBadge"
+  | "resultAgainButton";
+
+export const TOKEN_PART_LABELS: Record<TokenPart, string> = {
+  pageBackground: "화면 배경",
+  title: "이벤트 제목",
+  quantityCard: "수량 선택 카드",
+  stepper: "+/- 버튼",
+  quantityInput: "수량 입력창",
+  quickButton: "빠른선택 버튼",
+  resetButton: "초기화 버튼",
+  drawButton: "추첨 버튼",
+  stockPanel: "재고 패널",
+  stockRow: "재고 상품 행",
+  stockGauge: "확률 게이지",
+  stockDrawer: "재고 패널 아이콘",
+  spinner: "로딩 스피너",
+  progressLabel: "추첨 중 문구",
+  progressBar: "진행바",
+  resultTitle: "결과 제목",
+  resultCard: "결과 카드",
+  resultRow: "결과 상품 행",
+  resultBadge: "수량 뱃지",
+  resultAgainButton: "다시하기 버튼",
+};
+
 /** 미리보기에서 어느 화면을 봐야 이 토큰이 보이는지 */
 export type TokenScreen = "select" | "stock" | "drawing" | "result";
 
@@ -52,6 +98,8 @@ interface TokenDef {
   label: string;
   group: TokenGroup;
   screen: TokenScreen;
+  /** 미리보기에서 클릭 가능한 화면 요소 */
+  part: TokenPart;
   /** 오버라이드가 없을 때의 값. 기존 deriveDrawColors 로직을 그대로 옮긴 것 */
   derive: (t: BaseThemeColors, hasPoster: boolean) => string;
 }
@@ -70,6 +118,7 @@ export const THEME_TOKENS = [
   // ─── 메인 컬러 ───
   {
     id: "quickButtonBg",
+    part: "quickButton",
     label: "빠른선택 버튼 배경",
     group: "primaryColor",
     screen: "select",
@@ -77,6 +126,7 @@ export const THEME_TOKENS = [
   },
   {
     id: "drawButtonBg",
+    part: "drawButton",
     label: "추첨 버튼 배경",
     group: "primaryColor",
     screen: "select",
@@ -84,6 +134,7 @@ export const THEME_TOKENS = [
   },
   {
     id: "spinnerColor",
+    part: "spinner",
     label: "로딩 스피너",
     group: "primaryColor",
     screen: "drawing",
@@ -91,6 +142,7 @@ export const THEME_TOKENS = [
   },
   {
     id: "progressFillBg",
+    part: "progressBar",
     label: "진행바 채움",
     group: "primaryColor",
     screen: "drawing",
@@ -98,6 +150,7 @@ export const THEME_TOKENS = [
   },
   {
     id: "gaugeHighBg",
+    part: "stockGauge",
     label: "확률 게이지 (높음)",
     group: "primaryColor",
     screen: "stock",
@@ -105,6 +158,7 @@ export const THEME_TOKENS = [
   },
   {
     id: "stockPinActiveColor",
+    part: "stockDrawer",
     label: "재고 패널 핀 활성",
     group: "primaryColor",
     screen: "stock",
@@ -112,6 +166,7 @@ export const THEME_TOKENS = [
   },
   {
     id: "resultBadgeBg",
+    part: "resultBadge",
     label: "수량 뱃지 배경",
     group: "primaryColor",
     screen: "result",
@@ -119,6 +174,7 @@ export const THEME_TOKENS = [
   },
   {
     id: "resultAgainButtonBg",
+    part: "resultAgainButton",
     label: "다시하기 버튼 배경",
     group: "primaryColor",
     screen: "result",
@@ -128,6 +184,7 @@ export const THEME_TOKENS = [
   // ─── 보조 컬러 ───
   {
     id: "stepperButtonBg",
+    part: "stepper",
     label: "+/- 버튼 배경",
     group: "secondaryColor",
     screen: "select",
@@ -135,6 +192,7 @@ export const THEME_TOKENS = [
   },
   {
     id: "resetButtonBg",
+    part: "resetButton",
     label: "초기화 버튼 배경",
     group: "secondaryColor",
     screen: "select",
@@ -142,6 +200,7 @@ export const THEME_TOKENS = [
   },
   {
     id: "stockPanelBg",
+    part: "stockPanel",
     label: "재고 패널 배경",
     group: "secondaryColor",
     screen: "stock",
@@ -149,6 +208,7 @@ export const THEME_TOKENS = [
   },
   {
     id: "gaugeLowBg",
+    part: "stockGauge",
     label: "확률 게이지 (낮음)",
     group: "secondaryColor",
     screen: "stock",
@@ -156,6 +216,7 @@ export const THEME_TOKENS = [
   },
   {
     id: "progressTrackBg",
+    part: "progressBar",
     label: "진행바 트랙",
     group: "secondaryColor",
     screen: "drawing",
@@ -163,6 +224,7 @@ export const THEME_TOKENS = [
   },
   {
     id: "resultImageBg",
+    part: "resultRow",
     label: "상품 이미지 자리 배경",
     group: "secondaryColor",
     screen: "result",
@@ -172,6 +234,7 @@ export const THEME_TOKENS = [
   // ─── 배경 컬러 ───
   {
     id: "pageBg",
+    part: "pageBackground",
     label: "화면 배경",
     group: "backgroundColor",
     screen: "select",
@@ -179,6 +242,7 @@ export const THEME_TOKENS = [
   },
   {
     id: "inputBg",
+    part: "quantityInput",
     label: "수량 입력창 배경",
     group: "backgroundColor",
     screen: "select",
@@ -188,6 +252,7 @@ export const THEME_TOKENS = [
   // ─── 강조 컬러 ───
   {
     id: "quantityCardBg",
+    part: "quantityCard",
     label: "수량 선택 카드 배경",
     group: "accentColor",
     screen: "select",
@@ -195,6 +260,7 @@ export const THEME_TOKENS = [
   },
   {
     id: "stockRowBg",
+    part: "stockRow",
     label: "재고 상품 행 배경",
     group: "accentColor",
     screen: "stock",
@@ -202,6 +268,7 @@ export const THEME_TOKENS = [
   },
   {
     id: "gaugeMidBg",
+    part: "stockGauge",
     label: "확률 게이지 (보통)",
     group: "accentColor",
     screen: "stock",
@@ -209,6 +276,7 @@ export const THEME_TOKENS = [
   },
   {
     id: "resultCardBg",
+    part: "resultCard",
     label: "결과 카드 배경",
     group: "accentColor",
     screen: "result",
@@ -216,6 +284,7 @@ export const THEME_TOKENS = [
   },
   {
     id: "resultRowBg",
+    part: "resultRow",
     label: "결과 상품 행 배경",
     group: "accentColor",
     screen: "result",
@@ -225,6 +294,7 @@ export const THEME_TOKENS = [
   // ─── 제목 텍스트 ───
   {
     id: "titleText",
+    part: "title",
     label: "이벤트 제목",
     group: "textColor",
     screen: "select",
@@ -232,6 +302,7 @@ export const THEME_TOKENS = [
   },
   {
     id: "quantityCardTitleText",
+    part: "quantityCard",
     label: "수량 선택 카드 제목",
     group: "textColor",
     screen: "select",
@@ -239,6 +310,7 @@ export const THEME_TOKENS = [
   },
   {
     id: "stepperButtonText",
+    part: "stepper",
     label: "+/- 버튼 글자",
     group: "textColor",
     screen: "select",
@@ -246,6 +318,7 @@ export const THEME_TOKENS = [
   },
   {
     id: "quickButtonText",
+    part: "quickButton",
     label: "빠른선택 버튼 글자",
     group: "textColor",
     screen: "select",
@@ -253,6 +326,7 @@ export const THEME_TOKENS = [
   },
   {
     id: "resetButtonText",
+    part: "resetButton",
     label: "초기화 버튼 글자",
     group: "textColor",
     screen: "select",
@@ -260,6 +334,7 @@ export const THEME_TOKENS = [
   },
   {
     id: "inputText",
+    part: "quantityInput",
     label: "수량 입력창 글자",
     group: "textColor",
     screen: "select",
@@ -267,6 +342,7 @@ export const THEME_TOKENS = [
   },
   {
     id: "stockProductNameText",
+    part: "stockRow",
     label: "재고 상품명",
     group: "textColor",
     screen: "stock",
@@ -274,6 +350,7 @@ export const THEME_TOKENS = [
   },
   {
     id: "progressText",
+    part: "progressLabel",
     label: "추첨 중 문구",
     group: "textColor",
     screen: "drawing",
@@ -281,6 +358,7 @@ export const THEME_TOKENS = [
   },
   {
     id: "resultTitleText",
+    part: "resultTitle",
     label: "결과 제목",
     group: "textColor",
     screen: "result",
@@ -288,6 +366,7 @@ export const THEME_TOKENS = [
   },
   {
     id: "resultProductNameText",
+    part: "resultRow",
     label: "결과 상품명",
     group: "textColor",
     screen: "result",
@@ -297,6 +376,7 @@ export const THEME_TOKENS = [
   // ─── 본문 텍스트 ───
   {
     id: "drawButtonText",
+    part: "drawButton",
     label: "추첨 버튼 글자",
     group: "subTextColor",
     screen: "select",
@@ -304,6 +384,7 @@ export const THEME_TOKENS = [
   },
   {
     id: "stockPanelTitleText",
+    part: "stockPanel",
     label: "재고 패널 제목",
     group: "subTextColor",
     screen: "stock",
@@ -311,6 +392,7 @@ export const THEME_TOKENS = [
   },
   {
     id: "stockCountText",
+    part: "stockRow",
     label: "재고 수량 글자",
     group: "subTextColor",
     screen: "stock",
@@ -318,6 +400,7 @@ export const THEME_TOKENS = [
   },
   {
     id: "stockMutedText",
+    part: "stockRow",
     label: "품절 상품 글자",
     group: "subTextColor",
     screen: "stock",
@@ -325,13 +408,16 @@ export const THEME_TOKENS = [
   },
   {
     id: "gaugeTrackBg",
+    part: "stockGauge",
     label: "확률 게이지 트랙",
     group: "subTextColor",
     screen: "stock",
-    derive: (t) => `${faint(t)}30`,
+    // faint()는 이미 알파 80을 붙이므로 여기에 30을 또 붙이면 10자리 무효 hex가 된다
+    derive: (t) => `${t.subTextColor}30`,
   },
   {
     id: "stockDrawerIconColor",
+    part: "stockDrawer",
     label: "재고 패널 아이콘",
     group: "subTextColor",
     screen: "stock",
@@ -339,6 +425,7 @@ export const THEME_TOKENS = [
   },
   {
     id: "progressSubText",
+    part: "progressLabel",
     label: "진행 상태 보조 문구",
     group: "subTextColor",
     screen: "drawing",
@@ -346,6 +433,7 @@ export const THEME_TOKENS = [
   },
   {
     id: "resultBadgeText",
+    part: "resultBadge",
     label: "수량 뱃지 글자",
     group: "subTextColor",
     screen: "result",
@@ -353,6 +441,7 @@ export const THEME_TOKENS = [
   },
   {
     id: "resultAgainButtonText",
+    part: "resultAgainButton",
     label: "다시하기 버튼 글자",
     group: "subTextColor",
     screen: "result",

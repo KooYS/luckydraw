@@ -25,6 +25,7 @@ export default function StockDisplay({
   return (
     <div
       className="p-4 rounded-xl backdrop-blur"
+      data-token-part="stockPanel"
       style={{ backgroundColor: colors.stockPanelBg }}
     >
       <div className="flex justify-between items-center mb-3">
@@ -45,6 +46,7 @@ export default function StockDisplay({
             <div
               key={product.id}
               className="rounded-lg overflow-hidden"
+              data-token-part="stockRow"
               style={{ backgroundColor: colors.stockRowBg }}
             >
               <div className="flex items-center justify-between px-3 py-[4px]">
@@ -86,6 +88,7 @@ export default function StockDisplay({
               </div>
               <div
                 className="h-1 w-full"
+                data-token-part="stockGauge"
                 style={{ backgroundColor: colors.gaugeTrackBg }}
               >
                 <div

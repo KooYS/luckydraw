@@ -125,16 +125,17 @@ export default function EventSettingsForm({
                 group={group}
                 groupColor={form[group]}
                 onGroupColorChange={(value) => updateField(group, value)}
-                theme={{ ...form, posterUrl: form.posterUrl || null }}
                 overrides={form.themeTokens}
-                onOverridesChange={(next) => updateField("themeTokens", next)}
               />
             ))}
           </div>
 
           <ColorSwatchGroup swatches={swatches} />
 
-          <ThemePreview form={form} />
+          <ThemePreview
+            form={form}
+            onTokensChange={(next) => updateField("themeTokens", next)}
+          />
         </CardContent>
       </Card>
 
