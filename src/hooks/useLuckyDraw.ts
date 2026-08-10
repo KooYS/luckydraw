@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useEffect } from "react";
 import { Event, Product, EventTheme } from "@/db/schema";
+import { resolveThemeTokens, ResolvedTokens } from "@/lib/themeTokens";
 
 type DrawState = "select" | "drawing" | "result";
 
@@ -39,7 +40,7 @@ interface UseLuckyDrawReturn {
     hasStock: boolean;
     productsWithProbability: ProductWithProbability[];
     hasPoster: boolean;
-    colors: DrawPageColors;
+    colors: ResolvedTokens;
   };
   actions: {
     setQuantity: (qty: number) => void;
@@ -49,19 +50,6 @@ interface UseLuckyDrawReturn {
     executeDraw: () => Promise<void>;
     reset: () => void;
   };
-}
-
-interface DrawPageColors {
-  textColor: string;
-  textColorMuted: string;
-  textColorFaint: string;
-  cardBg: string;
-  cardBgHover: string;
-  buttonBg: string;
-  buttonBgHover: string;
-  inputBg: string;
-  inputText: string;
-  infoBg: string;
 }
 
 /** 럭키드로우 비즈니스 로직 훅 */
@@ -127,38 +115,7 @@ export function useLuckyDraw({
   const productsWithProbability = calculateRealTimeProbabilities();
   const hasPoster = !!event?.posterUrl;
 
-  /** 관리자 설정 색상 + 포스터 유무에 따른 배경 계산 */
-  const colors: DrawPageColors = event
-    ? {
-        textColor: event.textColor,
-        textColorMuted: event.subTextColor,
-        textColorFaint: `${event.subTextColor}80`,
-        cardBg: hasPoster ? "rgba(255,255,255,0.1)" : `${event.accentColor}20`,
-        cardBgHover: hasPoster
-          ? "rgba(255,255,255,0.2)"
-          : `${event.accentColor}30`,
-        buttonBg: hasPoster
-          ? "rgba(255,255,255,0.2)"
-          : `${event.secondaryColor}20`,
-        buttonBgHover: hasPoster
-          ? "rgba(255,255,255,0.3)"
-          : `${event.secondaryColor}30`,
-        inputBg: hasPoster ? "#ffffff" : event.backgroundColor,
-        inputText: hasPoster ? event.primaryColor : event.textColor,
-        infoBg: hasPoster ? "rgba(0,0,0,0.3)" : `${event.secondaryColor}15`,
-      }
-    : {
-        textColor: "#1f2937",
-        textColorMuted: "#6b7280",
-        textColorFaint: "#9ca3af",
-        cardBg: "rgba(0,0,0,0.05)",
-        cardBgHover: "rgba(0,0,0,0.1)",
-        buttonBg: "rgba(0,0,0,0.1)",
-        buttonBgHover: "rgba(0,0,0,0.15)",
-        inputBg: "#ffffff",
-        inputText: "#1f2937",
-        infoBg: "rgba(0,0,0,0.05)",
-      };
+  const colors = resolveThemeTokens(event, event?.themeTokens);
 
   /** 럭키드로우 실행 */
   const executeDraw = useCallback(async () => {

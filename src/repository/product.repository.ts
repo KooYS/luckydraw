@@ -3,19 +3,24 @@ import { products } from "@/db/schema";
 import { eq, and, sql } from "drizzle-orm";
 import { BaseRepository } from "./base.repository";
 
+/** 숫자를 숫자로 비교하는 이름 정렬 ("10등"이 "2등" 뒤로 가도록) */
+const byNameNatural = (a: { name: string }, b: { name: string }) =>
+  a.name.localeCompare(b.name, "ko", { numeric: true });
+
 /** 상품 리포지토리 */
 class ProductRepository extends BaseRepository<typeof products> {
   constructor() {
     super(products);
   }
 
-  /** 이벤트별 상품 조회 (확률 오름차순: totalQuantity * weight ASC) */
+  /** 이벤트별 상품 조회 (이름 자연 정렬: 1등 < 2등 < 10등) */
   async findByEventId(eventId: number) {
-    return db
+    const rows = await db
       .select()
       .from(this.table)
-      .where(and(eq(products.eventId, eventId), this.notDeleted))
-      .orderBy(sql`${products.totalQuantity} * ${products.weight} ASC`);
+      .where(and(eq(products.eventId, eventId), this.notDeleted));
+
+    return rows.sort(byNameNatural);
   }
 
   /** 이벤트별 재고 있는 상품 조회 (확률 오름차순) */

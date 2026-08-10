@@ -3,6 +3,7 @@
 import { useState, useCallback, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Event, Product } from "@/db/schema";
+import type { ThemeTokenOverrides } from "@/lib/themeTokens";
 
 /** API에서 반환하는 이벤트 타입 (adminPassword 대신 hasPassword/isAuthenticated 포함) */
 type EventResponse = Omit<Event, "adminPassword"> & {
@@ -37,6 +38,8 @@ export interface EventFormState {
   showStockPanel: boolean;
   passwordProtected: boolean;
   adminPassword: string;
+  /** 세부 색 오버라이드. 비어 있는 슬롯은 위 6색에서 파생 */
+  themeTokens: ThemeTokenOverrides;
 }
 
 /** 확률이 포함된 상품 타입 */
@@ -74,6 +77,7 @@ const INITIAL_EVENT_FORM: EventFormState = {
   showStockPanel: true,
   passwordProtected: false,
   adminPassword: "",
+  themeTokens: {},
 };
 
 /** 이벤트 상세 훅 반환 타입 */
@@ -182,6 +186,7 @@ export function useEventDetail(eventId: string): UseEventDetailReturn {
         showStockPanel: event.showStockPanel ?? true,
         passwordProtected: event.hasPassword ?? false,
         adminPassword: "",
+        themeTokens: event.themeTokens ?? {},
       });
       setIsEventFormInitialized(true);
     }

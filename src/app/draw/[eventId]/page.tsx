@@ -84,9 +84,9 @@ export default function DrawPage() {
       ref={mainRef}
       className="draw-fullscreen h-screen flex flex-col relative overflow-hidden"
       style={{
-        backgroundColor: event.backgroundColor,
+        backgroundColor: colors.pageBg,
         backgroundImage: event.posterUrl
-          ? `url(${event.posterUrl})`
+          ? `url("${event.posterUrl}")`
           : undefined,
         backgroundSize: "cover",
         backgroundPosition: "center",
@@ -114,9 +114,6 @@ export default function DrawPage() {
           <StockDrawer
             products={productsWithProbability}
             totalStock={totalStock}
-            primaryColor={event.primaryColor}
-            accentColor={event.accentColor}
-            secondaryColor={event.secondaryColor}
             colors={colors}
           />
         )}
@@ -159,7 +156,7 @@ export default function DrawPage() {
                 ) : (
                   <h1
                     className="text-2xl font-bold"
-                    style={{ color: colors.textColor }}
+                    style={{ color: colors.titleText }}
                   >
                     {event.name}
                   </h1>
@@ -173,14 +170,13 @@ export default function DrawPage() {
                 onChange={actions.setQuantity}
                 onQuickIncrement={actions.quickIncrement}
                 colors={colors}
-                primaryColor={event.primaryColor}
               />
 
               <DrawButton
                 onClick={actions.executeDraw}
                 disabled={!hasStock}
-                color={event.primaryColor}
-                textColor={event.subTextColor}
+                color={colors.drawButtonBg}
+                textColor={colors.drawButtonText}
                 label={t.drawN(state.quantity)}
               />
 
@@ -195,11 +191,7 @@ export default function DrawPage() {
 
         {state.drawState === "drawing" && (
           <div className="text-center">
-            <DrawProgress
-              quantity={state.quantity}
-              primaryColor={event.primaryColor}
-              colors={colors}
-            />
+            <DrawProgress quantity={state.quantity} colors={colors} />
           </div>
         )}
 
@@ -207,7 +199,6 @@ export default function DrawPage() {
           <div className="w-full max-w-lg landscape:max-w-3xl">
             <DrawResult
               summary={state.summary}
-              primaryColor={event.primaryColor}
               onReset={actions.reset}
               colors={colors}
             />

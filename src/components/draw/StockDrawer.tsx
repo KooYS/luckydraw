@@ -5,6 +5,7 @@ import StockDisplay from "./StockDisplay";
 import { Product } from "@/db/schema";
 import { useStockDrawerStore } from "@/stores/useStockDrawerStore";
 import { useLang } from "@/lib/i18n";
+import type { ResolvedTokens } from "@/lib/themeTokens";
 
 interface ProductWithProbability extends Product {
   realTimeProbability: string;
@@ -13,24 +14,12 @@ interface ProductWithProbability extends Product {
 interface StockDrawerProps {
   products: ProductWithProbability[];
   totalStock: number;
-  primaryColor: string;
-  accentColor: string;
-  secondaryColor: string;
-  colors: {
-    textColor: string;
-    textColorMuted: string;
-    textColorFaint: string;
-    cardBg: string;
-    infoBg: string;
-  };
+  colors: ResolvedTokens;
 }
 
 export default function StockDrawer({
   products,
   totalStock,
-  primaryColor,
-  accentColor,
-  secondaryColor,
   colors,
 }: StockDrawerProps) {
   const {
@@ -77,7 +66,7 @@ export default function StockDrawer({
 
   const header = (
     <div className="flex items-center justify-between px-4 pt-3 pb-2">
-      <span className="text-sm font-semibold" style={{ color: colors.textColor }}>
+      <span className="text-sm font-semibold" style={{ color: colors.stockPanelTitleText }}>
         {t.stockStatus}
       </span>
       <div className="flex items-center gap-1.5">
@@ -85,8 +74,10 @@ export default function StockDrawer({
           onClick={() => setPinned(!pinned)}
           className="p-1.5 rounded-lg transition-colors"
           style={{
-            color: pinned ? primaryColor : colors.textColorMuted,
-            backgroundColor: pinned ? `${primaryColor}20` : colors.cardBg,
+            color: pinned ? colors.stockPinActiveColor : colors.stockDrawerIconColor,
+            backgroundColor: pinned
+              ? `${colors.stockPinActiveColor}20`
+              : colors.stockRowBg,
           }}
         >
           <svg
@@ -102,7 +93,10 @@ export default function StockDrawer({
         <button
           onClick={handleClose}
           className="p-1.5 rounded-lg transition-colors"
-          style={{ color: colors.textColorMuted, backgroundColor: colors.cardBg }}
+          style={{
+            color: colors.stockDrawerIconColor,
+            backgroundColor: colors.stockRowBg,
+          }}
         >
           <svg
             width="18" height="18" viewBox="0 0 24 24"
@@ -120,9 +114,6 @@ export default function StockDrawer({
       <StockDisplay
         products={products}
         totalStock={totalStock}
-        primaryColor={primaryColor}
-        accentColor={accentColor}
-        secondaryColor={secondaryColor}
         colors={colors}
       />
     </div>
@@ -143,7 +134,7 @@ export default function StockDrawer({
           }}
         >
           <svg width="12" height="48" viewBox="0 0 12 48" fill="none">
-            <path d="M12 0 L12 48 L5 43 Q0 40 0 35 L0 13 Q0 8 5 5 Z" fill={`${primaryColor}99`} />
+            <path d="M12 0 L12 48 L5 43 Q0 40 0 35 L0 13 Q0 8 5 5 Z" fill={`${colors.stockPinActiveColor}99`} />
             <path d="M7 20 L4 24 L7 28" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
           </svg>
         </button>
@@ -165,7 +156,7 @@ export default function StockDrawer({
           className="fixed top-0 right-0 h-full z-50 flex flex-col transition-transform duration-300 ease-out w-[85vw] max-w-sm backdrop-blur-xl"
           style={{
             transform: open ? "translateX(0)" : "translateX(100%)",
-            backgroundColor: colors.infoBg,
+            backgroundColor: colors.stockPanelBg,
           }}
         >
           {header}
@@ -189,7 +180,7 @@ export default function StockDrawer({
         }}
       >
         <svg width="48" height="12" viewBox="0 0 48 12" fill="none">
-          <path d="M0 12 L48 12 L43 5 Q40 0 35 0 L13 0 Q8 0 5 5 Z" fill={`${primaryColor}99`} />
+          <path d="M0 12 L48 12 L43 5 Q40 0 35 0 L13 0 Q8 0 5 5 Z" fill={`${colors.stockPinActiveColor}99`} />
           <path d="M20 7 L24 4 L28 7" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
         </svg>
       </button>
@@ -212,11 +203,11 @@ export default function StockDrawer({
         style={{
           maxHeight: "60vh",
           transform: open ? "translateY(0)" : "translateY(100%)",
-          backgroundColor: colors.infoBg,
+          backgroundColor: colors.stockPanelBg,
         }}
       >
         <div className="flex justify-center pt-2 pb-1">
-          <div className="w-10 h-1 rounded-full" style={{ backgroundColor: colors.textColorFaint }} />
+          <div className="w-10 h-1 rounded-full" style={{ backgroundColor: colors.stockMutedText }} />
         </div>
         {header}
         {stockContent}

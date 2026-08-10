@@ -11,7 +11,8 @@ import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import ImageUpload from "@/components/common/ImageUpload";
 import FontUpload from "@/components/common/FontUpload";
-import { ColorPicker, ColorSwatchGroup, ThemePreview } from "@/components/admin/theme";
+import { ColorSwatchGroup, ThemePreview, TokenGroupEditor } from "@/components/admin/theme";
+import { THEME_GROUPS, type ThemeTokenOverrides } from "@/lib/themeTokens";
 
 interface NewEventForm {
   name: string;
@@ -28,6 +29,7 @@ interface NewEventForm {
   posterOverlay: boolean;
   fontUrl: string;
   showStockPanel: boolean;
+  themeTokens: ThemeTokenOverrides;
 }
 
 const INITIAL_FORM: NewEventForm = {
@@ -45,6 +47,7 @@ const INITIAL_FORM: NewEventForm = {
   posterOverlay: true,
   fontUrl: "",
   showStockPanel: true,
+  themeTokens: {},
 };
 
 export default function NewEventPage() {
@@ -171,37 +174,18 @@ export default function NewEventPage() {
               <CardTitle>테마 설정</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-2 gap-4">
-                <ColorPicker
-                  label="메인 컬러"
-                  value={form.primaryColor}
-                  onChange={(value) => updateField("primaryColor", value)}
-                />
-                <ColorPicker
-                  label="보조 컬러"
-                  value={form.secondaryColor}
-                  onChange={(value) => updateField("secondaryColor", value)}
-                />
-                <ColorPicker
-                  label="배경 컬러"
-                  value={form.backgroundColor}
-                  onChange={(value) => updateField("backgroundColor", value)}
-                />
-                <ColorPicker
-                  label="강조 컬러"
-                  value={form.accentColor}
-                  onChange={(value) => updateField("accentColor", value)}
-                />
-                <ColorPicker
-                  label="제목 텍스트"
-                  value={form.textColor}
-                  onChange={(value) => updateField("textColor", value)}
-                />
-                <ColorPicker
-                  label="본문 텍스트"
-                  value={form.subTextColor}
-                  onChange={(value) => updateField("subTextColor", value)}
-                />
+              <div className="space-y-2">
+                {THEME_GROUPS.map((group) => (
+                  <TokenGroupEditor
+                    key={group}
+                    group={group}
+                    groupColor={form[group]}
+                    onGroupColorChange={(value) => updateField(group, value)}
+                    theme={{ ...form, posterUrl: form.posterUrl || null }}
+                    overrides={form.themeTokens}
+                    onOverridesChange={(next) => updateField("themeTokens", next)}
+                  />
+                ))}
               </div>
 
               <ColorSwatchGroup swatches={swatches} />

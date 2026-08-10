@@ -1,6 +1,7 @@
 "use client";
 
 import { useLang } from "@/lib/i18n";
+import type { ResolvedTokens } from "@/lib/themeTokens";
 
 interface QuantitySelectorProps {
   quantity: number;
@@ -9,14 +10,7 @@ interface QuantitySelectorProps {
   onDecrement: () => void;
   onChange: (qty: number) => void;
   onQuickIncrement: (qty: number) => void;
-  colors: {
-    textColor: string;
-    buttonBg: string;
-    inputBg: string;
-    inputText: string;
-    cardBg: string;
-  };
-  primaryColor: string;
+  colors: ResolvedTokens;
 }
 
 /** 수량 선택 컴포넌트 */
@@ -28,7 +22,6 @@ export default function QuantitySelector({
   onChange,
   onQuickIncrement,
   colors,
-  primaryColor,
 }: QuantitySelectorProps) {
   const t = useLang();
   const quickOptions = [1, 5, 10, 20];
@@ -36,11 +29,11 @@ export default function QuantitySelector({
   return (
     <div
       className="backdrop-blur rounded-2xl p-6"
-      style={{ backgroundColor: colors.cardBg }}
+      style={{ backgroundColor: colors.quantityCardBg }}
     >
       <h2
         className="text-lg text-center font-bold mb-4"
-        style={{ color: colors.textColor }}
+        style={{ color: colors.quantityCardTitleText }}
       >
         {t.selectQuantity}
       </h2>
@@ -49,7 +42,10 @@ export default function QuantitySelector({
         <button
           onClick={onDecrement}
           className="w-12 h-12 rounded-full text-2xl font-bold transition"
-          style={{ backgroundColor: colors.buttonBg, color: colors.textColor }}
+          style={{
+            backgroundColor: colors.stepperButtonBg,
+            color: colors.stepperButtonText,
+          }}
         >
           -
         </button>
@@ -65,7 +61,10 @@ export default function QuantitySelector({
         <button
           onClick={onIncrement}
           className="w-12 h-12 rounded-full text-2xl font-bold transition"
-          style={{ backgroundColor: colors.buttonBg, color: colors.textColor }}
+          style={{
+            backgroundColor: colors.stepperButtonBg,
+            color: colors.stepperButtonText,
+          }}
         >
           +
         </button>
@@ -79,8 +78,8 @@ export default function QuantitySelector({
             disabled={n > maxQuantity}
             className="px-4 py-2 rounded-lg text-sm font-medium transition"
             style={{
-              backgroundColor: primaryColor,
-              color: colors.textColor,
+              backgroundColor: colors.quickButtonBg,
+              color: colors.quickButtonText,
               opacity: n > maxQuantity ? 0.5 : 1,
               cursor: n > maxQuantity ? "not-allowed" : "pointer",
             }}
@@ -92,8 +91,8 @@ export default function QuantitySelector({
           onClick={() => onChange(0)}
           className="px-4 py-2 rounded-lg text-sm font-medium transition border"
           style={{
-            backgroundColor: colors.buttonBg,
-            color: colors.textColor,
+            backgroundColor: colors.resetButtonBg,
+            color: colors.resetButtonText,
           }}
         >
           {t.reset}
