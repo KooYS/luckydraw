@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
+import RunDrawDialog from "@/components/admin/RunDrawDialog";
 
 interface EventListProps {
   events: Event[];
@@ -81,9 +82,11 @@ export default function EventList({
               <Button variant="outline" size="sm" asChild>
                 <Link href={`/admin/events/${event.id}`}>관리</Link>
               </Button>
-              <Button variant="secondary" size="sm" asChild>
-                <Link href={`/draw/${event.id}`}>실행</Link>
-              </Button>
+              <RunDrawDialog eventId={event.id}>
+                <Button variant="secondary" size="sm">
+                  실행
+                </Button>
+              </RunDrawDialog>
               <Button
                 variant="outline"
                 size="sm"
