@@ -25,6 +25,33 @@ export interface DrawBatch {
 export const RECOVERY_WINDOW_SEC = 10 * 60;
 
 const ackKey = (eventId: string) => `luckydraw:acked:${eventId}`;
+const pendingKey = (eventId: string) => `luckydraw:pending:${eventId}`;
+
+/** 추첨을 쐈다고 표시 (요청 직전). 남아 있으면 = 이 화면은 결과를 모른다는 뜻. */
+export function markPending(eventId: string) {
+  try {
+    localStorage.setItem(pendingKey(eventId), String(Date.now()));
+  } catch {
+    // 저장 불가 환경 — 복구가 안 뜰 뿐, 잘못된 화면을 띄우진 않는다
+  }
+}
+
+/** 결과를 확인했으니 표시 해제 */
+export function clearPending(eventId: string) {
+  try {
+    localStorage.removeItem(pendingKey(eventId));
+  } catch {
+    // 무시
+  }
+}
+
+export function hasPending(eventId: string): boolean {
+  try {
+    return localStorage.getItem(pendingKey(eventId)) !== null;
+  } catch {
+    return false;
+  }
+}
 
 /** 이 배치는 화면으로 확인했다고 표시 (새로고침·기기 재시작에도 남아야 해서 localStorage) */
 export function ack(eventId: string, drawnAt: string) {
@@ -53,13 +80,20 @@ export function formatBatchTime(drawnAt: string): string {
   return drawnAt.slice(11, 19);
 }
 
-/** 이 배치가 "화면이 확인하지 못한 최근 추첨"인가 */
-export function isUnacked(
+/**
+ * 이 배치를 복구 화면으로 띄워야 하는가.
+ *
+ * 조건은 "이 화면이 추첨을 쐈는데 결과를 못 받았다"(pending)는 것.
+ * 추첨을 쏘지도 않은 화면 — 두 번째 모니터, 새 탭, 뒤늦게 연 기기 — 이
+ * 남의 정상 추첨을 사고로 오해하면 안 된다.
+ */
+export function shouldRecover(
   latest: DrawBatch | null | undefined,
-  acked: string | null,
+  state: { pending: boolean; acked: string | null },
   windowSec: number = RECOVERY_WINDOW_SEC,
 ): boolean {
   if (!latest) return false;
-  if (latest.drawnAt === acked) return false;
+  if (!state.pending) return false;
+  if (latest.drawnAt === state.acked) return false;
   return latest.ageSec <= windowSec;
 }

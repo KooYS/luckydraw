@@ -3,7 +3,15 @@
 import { useState, useCallback, useEffect, useMemo, useRef } from "react";
 import { Event, Product, EventTheme } from "@/db/schema";
 import { resolveThemeTokens, ResolvedTokens } from "@/lib/themeTokens";
-import { ack, isUnacked, readAck, type DrawBatch } from "@/lib/drawRecovery";
+import {
+  ack,
+  clearPending,
+  hasPending,
+  markPending,
+  readAck,
+  shouldRecover,
+  type DrawBatch,
+} from "@/lib/drawRecovery";
 
 type DrawState = "select" | "drawing" | "result";
 
@@ -119,8 +127,11 @@ export function useLuckyDraw({
       }));
     }, [products]);
 
-  /** 화면이 확인하지 못한 최근 배치 조회. 없으면 null, 조회 실패면 throw */
+  /** 이 화면이 결과를 못 받은 배치 조회. 없으면 null, 조회 실패면 throw */
   const findUnackedBatch = useCallback(async (): Promise<DrawBatch | null> => {
+    // 이 화면이 추첨을 쏜 적이 없으면 볼 것도 없다 (병렬로 띄운 다른 화면 보호)
+    if (!hasPending(eventId)) return null;
+
     const res = await fetch(`/api/events/${eventId}/batches?limit=1`, {
       cache: "no-store",
       signal: AbortSignal.timeout(LOAD_TIMEOUT_MS),
@@ -128,7 +139,8 @@ export function useLuckyDraw({
     if (!res.ok) throw new Error(`batches ${res.status}`);
 
     const latest: DrawBatch | undefined = (await res.json()).batches?.[0];
-    return isUnacked(latest, readAck(eventId)) ? latest! : null;
+    const state = { pending: hasPending(eventId), acked: readAck(eventId) };
+    return shouldRecover(latest, state) ? latest! : null;
   }, [eventId]);
 
   const fetchProducts = useCallback(async (): Promise<Product[]> => {
@@ -206,6 +218,8 @@ export function useLuckyDraw({
     if (quantity === 0 || inFlight.current) return;
 
     inFlight.current = true;
+    // 요청을 쏘기 전에 표시한다 — 이 줄이 먼저여야 응답을 못 받아도 흔적이 남는다.
+    markPending(eventId);
     setDrawState("drawing");
     setSummary([]);
     setRecovered(null);
@@ -223,6 +237,7 @@ export function useLuckyDraw({
       const data = await response.json();
 
       ack(eventId, data.drawnAt);
+      clearPending(eventId);
       setSummary(data.summary || []);
       setProducts(data.updatedProducts || []);
       setDrawState("result");
@@ -248,8 +263,11 @@ export function useLuckyDraw({
           setDrawState("result");
           return;
         }
+        // 차감 안 된 게 확인됐으니 이 화면의 미결 상태도 해제한다.
+        clearPending(eventId);
         setError("safe");
       } catch {
+        // 확인 자체가 실패 — pending 을 남겨둬야 새로고침 때 다시 확인한다.
         setError("unknown");
       }
       setDrawState("select");
@@ -260,7 +278,10 @@ export function useLuckyDraw({
 
   /** 다시 시작 */
   const reset = useCallback(() => {
-    if (recovered) ack(eventId, recovered.drawnAt);
+    if (recovered) {
+      ack(eventId, recovered.drawnAt);
+      clearPending(eventId);
+    }
     setRecovered(null);
     setDrawState("select");
     setSummary([]);
