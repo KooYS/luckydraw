@@ -1,8 +1,11 @@
 import { NextResponse } from "next/server";
+import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { drawResults } from "@/db/schema";
 import { eventRepository, productRepository } from "@/repository";
 import { executeMultipleDraw } from "@/lib/draw";
+
+const MAX_QUANTITY = 10000;
 
 interface DrawResultItem {
   isWin: boolean;
@@ -17,11 +20,19 @@ interface DrawResultItem {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { eventId, quantity = 1 } = body;
+    const { eventId } = body;
+    const quantity = Number(body.quantity ?? 1);
 
     if (!eventId) {
       return NextResponse.json(
         { error: "이벤트 ID가 필요합니다." },
+        { status: 400 },
+      );
+    }
+
+    if (!Number.isInteger(quantity) || quantity < 1 || quantity > MAX_QUANTITY) {
+      return NextResponse.json(
+        { error: `추첨 수량은 1 이상 ${MAX_QUANTITY} 이하여야 합니다.` },
         { status: 400 },
       );
     }
@@ -57,10 +68,6 @@ export async function POST(request: Request) {
       }
     }
 
-    // 재고 일괄 감소 (상품 수만큼의 쿼리)
-    await productRepository.batchDecrementStock(stockDecrements);
-
-    // 결과 일괄 저장 (단일 쿼리)
     const insertValues = drawResultsData.map((result) => ({
       eventId,
       productId: result.product?.id || null,
@@ -68,9 +75,24 @@ export async function POST(request: Request) {
       productName: result.product?.name || null,
     }));
 
-    if (insertValues.length > 0) {
-      await db.insert(drawResults).values(insertValues);
-    }
+    // 재고 차감과 결과 기록을 한 트랜잭션으로 묶는다.
+    // 이 둘이 갈라지면 "히스토리에 없음"이 "재고 차감 안 됨"을 보장하지 못하고,
+    // 응답을 못 받은 클라이언트의 복구 판단(GET .../batches)이 거짓말을 하게 된다.
+    const drawnAt = await db.transaction(async (tx) => {
+      await productRepository.batchDecrementStock(stockDecrements, tx);
+
+      const [inserted] = await tx.insert(drawResults).values(insertValues);
+
+      // created_at 은 DB 가 채운다(단일 INSERT → 전 행 동일값 = 배치 ID).
+      // 앱 시계로 쓰면 DB 와 어긋날 수 있어 넣은 값을 되읽는다.
+      const [row] = await tx
+        .select({ createdAt: drawResults.createdAt })
+        .from(drawResults)
+        .where(eq(drawResults.id, inserted.insertId))
+        .limit(1);
+
+      return row.createdAt;
+    });
 
     // 응답 형식 변환
     const results: DrawResultItem[] = drawResultsData.map((result) => ({
@@ -106,6 +128,8 @@ export async function POST(request: Request) {
     return NextResponse.json({
       success: true,
       quantity,
+      // 클라이언트가 "이 배치는 내가 확인했다"고 표시하는 워터마크 값
+      drawnAt,
       results,
       summary: Object.values(summary),
       updatedProducts,

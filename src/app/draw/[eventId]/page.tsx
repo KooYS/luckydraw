@@ -10,6 +10,7 @@ import DrawProgress from "@/components/draw/DrawProgress";
 import DrawResult from "@/components/draw/DrawResult";
 import StockDrawer from "@/components/draw/StockDrawer";
 import SecretMenu from "@/components/draw/SecretMenu";
+import DrawHistory from "@/components/draw/DrawHistory";
 import { useStockDrawerStore } from "@/stores/useStockDrawerStore";
 import { useLang } from "@/lib/i18n";
 
@@ -21,6 +22,7 @@ export default function DrawPage() {
   const { setTheme } = useTheme();
   const mainRef = useRef<HTMLElement>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [historyOpen, setHistoryOpen] = useState(false);
   const drawerInset = useStockDrawerStore((s) => s.inset);
   const t = useLang();
 
@@ -122,7 +124,12 @@ export default function DrawPage() {
         isFullscreen={isFullscreen}
         onToggleFullscreen={toggleFullscreen}
         onGoAdmin={() => router.push(`/admin/events/${eventId}`)}
+        onOpenHistory={() => setHistoryOpen(true)}
       />
+
+      {historyOpen && (
+        <DrawHistory eventId={eventId} onClose={() => setHistoryOpen(false)} />
+      )}
 
       {/* 메인 콘텐츠 영역 */}
       <div
@@ -185,6 +192,16 @@ export default function DrawPage() {
                   {t.soldOut}
                 </p>
               )}
+
+              {/* 추첨 실패 안내. 토스트가 아니라 고정 문구 — 큰 화면에서 사라지면 놓친다 */}
+              {state.error && (
+                <p
+                  className="text-center font-bold leading-relaxed"
+                  style={{ color: state.error === "safe" ? "#fbbf24" : "#f87171" }}
+                >
+                  {state.error === "safe" ? t.drawFailedSafe : t.drawUnknown}
+                </p>
+              )}
             </div>
           </div>
         )}
@@ -201,6 +218,7 @@ export default function DrawPage() {
               summary={state.summary}
               onReset={actions.reset}
               colors={colors}
+              recovered={state.recovered}
             />
           </div>
         )}

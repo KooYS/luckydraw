@@ -1,4 +1,4 @@
-import { db } from "@/db";
+import { db, type Tx } from "@/db";
 import { products } from "@/db/schema";
 import { eq, and, sql } from "drizzle-orm";
 import { BaseRepository } from "./base.repository";
@@ -71,21 +71,21 @@ class ProductRepository extends BaseRepository<typeof products> {
       .where(eq(products.id, id));
   }
 
-  /** 재고 일괄 감소 (상품ID별 감소량) */
-  async batchDecrementStock(decrements: Record<number, number>) {
+  /** 재고 일괄 감소 (상품ID별 감소량). tx 를 넘기면 그 트랜잭션 안에서 실행된다. */
+  async batchDecrementStock(decrements: Record<number, number>, tx?: Tx) {
     const entries = Object.entries(decrements);
     if (entries.length === 0) return;
 
-    await Promise.all(
-      entries.map(([id, count]) =>
-        db
-          .update(this.table)
-          .set({
-            remainingQuantity: sql`GREATEST(${products.remainingQuantity} - ${count}, 0)`,
-          })
-          .where(eq(products.id, Number(id)))
-      )
-    );
+    // 트랜잭션은 커넥션 1개라 병렬 실행에 이득이 없다. 순차 루프가 그냥 더 단순.
+    const runner = tx ?? db;
+    for (const [id, count] of entries) {
+      await runner
+        .update(this.table)
+        .set({
+          remainingQuantity: sql`GREATEST(${products.remainingQuantity} - ${count}, 0)`,
+        })
+        .where(eq(products.id, Number(id)));
+    }
   }
 
   /** 재고 조정 */

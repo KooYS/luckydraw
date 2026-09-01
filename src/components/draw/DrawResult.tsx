@@ -17,6 +17,8 @@ interface DrawResultProps {
   summary: DrawSummary[];
   onReset: () => void;
   colors: ResolvedTokens;
+  /** 응답을 못 받아 히스토리에서 되살린 결과면 경고 배너를 띄운다 */
+  recovered?: { ageSec: number; total: number } | null;
 }
 
 /** 추첨 결과 컴포넌트 */
@@ -24,11 +26,29 @@ export default function DrawResult({
   summary,
   onReset,
   colors,
+  recovered,
 }: DrawResultProps) {
   const t = useLang();
 
   return (
     <div className="space-y-6">
+      {/* 브랜드 색을 안 쓴다 — 경고가 테마에 묻히면 운영자가 그냥 지나친다 */}
+      {recovered && (
+        <div className="rounded-2xl border-2 border-amber-400 bg-amber-950/85 px-5 py-4 text-center">
+          <p className="text-xl landscape:text-2xl font-bold text-amber-300">
+            ⚠️ {t.recoveredTitle}
+          </p>
+          <p className="mt-2 text-sm landscape:text-base leading-relaxed text-amber-100">
+            {t.recoveredDesc(
+              recovered.ageSec < 60
+                ? t.agoSec(recovered.ageSec)
+                : t.agoMin(Math.floor(recovered.ageSec / 60)),
+              recovered.total,
+            )}
+          </p>
+        </div>
+      )}
+
       <h2
         data-token-part="resultTitle"
         className="text-2xl text-center font-bold"
@@ -103,7 +123,7 @@ export default function DrawResult({
           color: colors.resultAgainButtonText,
         }}
       >
-        {t.drawAgain}
+        {recovered ? t.recoveredAck : t.drawAgain}
       </button>
     </div>
   );
