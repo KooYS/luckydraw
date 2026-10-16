@@ -10,7 +10,9 @@ import DrawProgress from "@/components/draw/DrawProgress";
 import DrawResult from "@/components/draw/DrawResult";
 import StockDrawer from "@/components/draw/StockDrawer";
 import SecretMenu from "@/components/draw/SecretMenu";
+import DrawHistory from "@/components/draw/DrawHistory";
 import { useStockDrawerStore } from "@/stores/useStockDrawerStore";
+import { useLang } from "@/lib/i18n";
 
 /** 럭키드로우 페이지 */
 export default function DrawPage() {
@@ -20,7 +22,9 @@ export default function DrawPage() {
   const { setTheme } = useTheme();
   const mainRef = useRef<HTMLElement>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [historyOpen, setHistoryOpen] = useState(false);
   const drawerInset = useStockDrawerStore((s) => s.inset);
+  const t = useLang();
 
   const { state, computed, actions } = useLuckyDraw({
     eventId,
@@ -57,7 +61,7 @@ export default function DrawPage() {
   if (state.loading) {
     return (
       <div className="h-dvh flex items-center justify-center bg-theme-background">
-        <div className="text-xl text-theme-text">로딩 중...</div>
+        <div className="text-xl text-theme-text">{t.loading}</div>
       </div>
     );
   }
@@ -65,7 +69,7 @@ export default function DrawPage() {
   if (!state.event) {
     return (
       <div className="h-dvh flex items-center justify-center bg-theme-background">
-        <div className="text-xl text-red-500">이벤트를 찾을 수 없습니다.</div>
+        <div className="text-xl text-red-500">{t.eventNotFound}</div>
       </div>
     );
   }
@@ -82,9 +86,9 @@ export default function DrawPage() {
       ref={mainRef}
       className="draw-fullscreen h-screen flex flex-col relative overflow-hidden"
       style={{
-        backgroundColor: event.backgroundColor,
+        backgroundColor: colors.pageBg,
         backgroundImage: event.posterUrl
-          ? `url(${event.posterUrl})`
+          ? `url("${event.posterUrl}")`
           : undefined,
         backgroundSize: "cover",
         backgroundPosition: "center",
@@ -112,9 +116,6 @@ export default function DrawPage() {
           <StockDrawer
             products={productsWithProbability}
             totalStock={totalStock}
-            primaryColor={event.primaryColor}
-            accentColor={event.accentColor}
-            secondaryColor={event.secondaryColor}
             colors={colors}
           />
         )}
@@ -123,7 +124,12 @@ export default function DrawPage() {
         isFullscreen={isFullscreen}
         onToggleFullscreen={toggleFullscreen}
         onGoAdmin={() => router.push(`/admin/events/${eventId}`)}
+        onOpenHistory={() => setHistoryOpen(true)}
       />
+
+      {historyOpen && (
+        <DrawHistory eventId={eventId} onClose={() => setHistoryOpen(false)} />
+      )}
 
       {/* 메인 콘텐츠 영역 */}
       <div
@@ -157,7 +163,7 @@ export default function DrawPage() {
                 ) : (
                   <h1
                     className="text-2xl font-bold"
-                    style={{ color: colors.textColor }}
+                    style={{ color: colors.titleText }}
                   >
                     {event.name}
                   </h1>
@@ -171,20 +177,29 @@ export default function DrawPage() {
                 onChange={actions.setQuantity}
                 onQuickIncrement={actions.quickIncrement}
                 colors={colors}
-                primaryColor={event.primaryColor}
               />
 
               <DrawButton
                 onClick={actions.executeDraw}
                 disabled={!hasStock}
-                color={event.primaryColor}
-                textColor={event.subTextColor}
-                label={`${state.quantity}개 추첨하기`}
+                color={colors.drawButtonBg}
+                textColor={colors.drawButtonText}
+                label={t.drawN(state.quantity)}
               />
 
               {!hasStock && (
                 <p className="text-center" style={{ color: "#ef4444" }}>
-                  모든 상품의 재고가 소진되었습니다.
+                  {t.soldOut}
+                </p>
+              )}
+
+              {/* 추첨 실패 안내. 토스트가 아니라 고정 문구 — 큰 화면에서 사라지면 놓친다 */}
+              {state.error && (
+                <p
+                  className="text-center font-bold leading-relaxed"
+                  style={{ color: state.error === "safe" ? "#fbbf24" : "#f87171" }}
+                >
+                  {state.error === "safe" ? t.drawFailedSafe : t.drawUnknown}
                 </p>
               )}
             </div>
@@ -193,11 +208,7 @@ export default function DrawPage() {
 
         {state.drawState === "drawing" && (
           <div className="text-center">
-            <DrawProgress
-              quantity={state.quantity}
-              primaryColor={event.primaryColor}
-              colors={colors}
-            />
+            <DrawProgress quantity={state.quantity} colors={colors} />
           </div>
         )}
 
@@ -205,9 +216,9 @@ export default function DrawPage() {
           <div className="w-full max-w-lg landscape:max-w-3xl">
             <DrawResult
               summary={state.summary}
-              primaryColor={event.primaryColor}
               onReset={actions.reset}
               colors={colors}
+              recovered={state.recovered}
             />
           </div>
         )}

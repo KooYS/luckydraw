@@ -1,12 +1,13 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Maximize, Minimize, Settings } from "lucide-react";
+import { History, Maximize, Minimize, Settings } from "lucide-react";
 
 interface SecretMenuProps {
   isFullscreen: boolean;
   onToggleFullscreen: () => void;
   onGoAdmin: () => void;
+  onOpenHistory: () => void;
 }
 
 /** 우측 상단 시크릿 메뉴 */
@@ -14,6 +15,7 @@ export default function SecretMenu({
   isFullscreen,
   onToggleFullscreen,
   onGoAdmin,
+  onOpenHistory,
 }: SecretMenuProps) {
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -54,6 +56,17 @@ export default function SecretMenu({
           >
             {isFullscreen ? <Minimize size={16} /> : <Maximize size={16} />}
             {isFullscreen ? "전체화면 해제" : "전체화면"}
+          </button>
+          <div className="border-t border-white/10" />
+          <button
+            onClick={() => {
+              onOpenHistory();
+              setOpen(false);
+            }}
+            className="w-full px-4 py-3 text-left text-sm text-white hover:bg-white/10 transition flex items-center gap-3"
+          >
+            <History size={16} />
+            추첨 이력
           </button>
           <div className="border-t border-white/10" />
           <button

@@ -6,7 +6,9 @@ import {
   boolean,
   datetime,
   text,
+  json,
 } from 'drizzle-orm/mysql-core'
+import type { ThemeTokenOverrides } from '@/lib/themeTokens'
 import { sql } from 'drizzle-orm'
 
 // ============================================================
@@ -57,6 +59,9 @@ export const events = mysqlTable('events', {
   textColor: varchar('text_color', { length: 7 }).default('#1f2937').notNull(),
   subTextColor: varchar('sub_text_color', { length: 7 }).default('#6b7280').notNull(),
   accentColor: varchar('accent_color', { length: 7 }).default('#e879f9').notNull(),
+
+  // 세부 색 오버라이드 (미설정 슬롯은 위 6색에서 파생)
+  themeTokens: json('theme_tokens').$type<ThemeTokenOverrides>(),
 
   // 이미지
   posterUrl: varchar('poster_url', { length: 500 }),

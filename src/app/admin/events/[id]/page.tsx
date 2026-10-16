@@ -15,6 +15,7 @@ import StockOverview from "@/components/admin/StockOverview";
 import ProductListCard from "@/components/admin/ProductListCard";
 import ProductFormDialog from "@/components/admin/ProductFormDialog";
 import EventSettingsForm from "@/components/admin/EventSettingsForm";
+import RunDrawDialog from "@/components/admin/RunDrawDialog";
 
 /** 이벤트 패스워드 게이트 */
 function EventPasswordGate({
@@ -151,18 +152,14 @@ export default function EventDetailPage() {
             </Badge>
           </div>
 
-          <Button
-            asChild
-            disabled={!computed.canRunDraw}
-            variant={computed.canRunDraw ? "default" : "secondary"}
-          >
-            <Link
-              href={`/draw/${event.id}`}
-              onClick={(e) => !computed.canRunDraw && e.preventDefault()}
+          <RunDrawDialog eventId={event.id}>
+            <Button
+              disabled={!computed.canRunDraw}
+              variant={computed.canRunDraw ? "default" : "secondary"}
             >
               럭키드로우 실행
-            </Link>
-          </Button>
+            </Button>
+          </RunDrawDialog>
         </div>
 
         {!event.isActive && (

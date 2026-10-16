@@ -23,13 +23,19 @@ export async function POST(request: Request) {
     const result = await eventRepository.createEvent({
       name: body.name,
       description: body.description,
+      titleImageUrl: body.titleImageUrl,
+      titleImageWidth: body.titleImageWidth,
       primaryColor: body.primaryColor,
       secondaryColor: body.secondaryColor,
       backgroundColor: body.backgroundColor,
       textColor: body.textColor,
+      subTextColor: body.subTextColor,
       accentColor: body.accentColor,
       posterUrl: body.posterUrl,
+      posterOverlay: body.posterOverlay,
       logoUrl: body.logoUrl,
+      fontUrl: body.fontUrl,
+      showStockPanel: body.showStockPanel,
       isActive: body.isActive,
     });
 

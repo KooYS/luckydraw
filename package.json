@@ -2,10 +2,9 @@
   "name": "luckydraw",
   "version": "0.1.0",
   "private": true,
-  "packageManager": "yarn@4.6.0",
   "scripts": {
     "dev": "next dev -p 4444 --turbopack",
-    "build": "next build",
+    "build": "next build && cp -r .next/static .next/standalone/.next/static && cp -r public .next/standalone/public",
     "start": "next start",
     "lint": "eslint src/",
     "db:generate": "drizzle-kit generate",

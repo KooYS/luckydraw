@@ -1,6 +1,8 @@
 "use client";
 
 import { Product } from "@/db/schema";
+import { useLang } from "@/lib/i18n";
+import type { ResolvedTokens } from "@/lib/themeTokens";
 
 interface ProductWithProbability extends Product {
   realTimeProbability: string;
@@ -9,41 +11,32 @@ interface ProductWithProbability extends Product {
 interface StockDisplayProps {
   products: ProductWithProbability[];
   totalStock: number;
-  primaryColor: string;
-  accentColor: string;
-  secondaryColor: string;
-  colors: {
-    textColor: string;
-    textColorMuted: string;
-    textColorFaint: string;
-    cardBg: string;
-    infoBg: string;
-  };
+  colors: ResolvedTokens;
 }
 
 /** 실시간 재고 및 확률 표시 컴포넌트 */
 export default function StockDisplay({
   products,
   totalStock,
-  primaryColor,
-  accentColor,
-  secondaryColor,
   colors,
 }: StockDisplayProps) {
+  const t = useLang();
+
   return (
     <div
       className="p-4 rounded-xl backdrop-blur"
-      style={{ backgroundColor: colors.infoBg }}
+      data-token-part="stockPanel"
+      style={{ backgroundColor: colors.stockPanelBg }}
     >
       <div className="flex justify-between items-center mb-3">
         <h3
           className="text-sm font-medium"
-          style={{ color: colors.textColorMuted }}
+          style={{ color: colors.stockPanelTitleText }}
         >
-          실시간 재고
+          {t.liveStock}
         </h3>
-        <span className="text-xs" style={{ color: colors.textColorFaint }}>
-          총 재고: {totalStock}개
+        <span className="text-xs" style={{ color: colors.stockMutedText }}>
+          {t.totalStock(totalStock)}
         </span>
       </div>
       <div className="space-y-3">
@@ -53,7 +46,8 @@ export default function StockDisplay({
             <div
               key={product.id}
               className="rounded-lg overflow-hidden"
-              style={{ backgroundColor: colors.cardBg }}
+              data-token-part="stockRow"
+              style={{ backgroundColor: colors.stockRowBg }}
             >
               <div className="flex items-center justify-between px-3 py-[4px]">
                 <span
@@ -61,8 +55,8 @@ export default function StockDisplay({
                   style={{
                     color:
                       product.remainingQuantity > 0
-                        ? colors.textColor
-                        : colors.textColorFaint,
+                        ? colors.stockProductNameText
+                        : colors.stockMutedText,
                   }}
                 >
                   {product.name}
@@ -73,8 +67,8 @@ export default function StockDisplay({
                     style={{
                       color:
                         product.remainingQuantity > 0
-                          ? accentColor
-                          : colors.textColorFaint,
+                          ? colors.gaugeMidBg
+                          : colors.stockMutedText,
                     }}
                   >
                     {product.realTimeProbability}%
@@ -84,8 +78,8 @@ export default function StockDisplay({
                     style={{
                       color:
                         product.remainingQuantity > 0
-                          ? colors.textColorMuted
-                          : colors.textColorFaint,
+                          ? colors.stockCountText
+                          : colors.stockMutedText,
                     }}
                   >
                     {product.remainingQuantity}/{product.totalQuantity}
@@ -94,7 +88,8 @@ export default function StockDisplay({
               </div>
               <div
                 className="h-1 w-full"
-                style={{ backgroundColor: `${colors.textColorFaint}30` }}
+                data-token-part="stockGauge"
+                style={{ backgroundColor: colors.gaugeTrackBg }}
               >
                 <div
                   className="h-full transition-all duration-700 ease-out"
@@ -102,11 +97,11 @@ export default function StockDisplay({
                     width: `${probability}%`,
                     backgroundColor:
                       probability > 30
-                        ? primaryColor
+                        ? colors.gaugeHighBg
                         : probability > 10
-                          ? accentColor
+                          ? colors.gaugeMidBg
                           : probability > 0
-                            ? secondaryColor
+                            ? colors.gaugeLowBg
                             : "transparent",
                   }}
                 />
